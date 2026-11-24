@@ -76,6 +76,9 @@ assert.equal(r.status, 400, "86 blocks");
 // Pickup without receipt rejected; with receipt -> pending, no print
 r = await j("/api/orders", { method: "POST", body: JSON.stringify({ branchId: branch.id, source: "pickup", paymentMethod: "cliq", customerName: "Sara", customerPhone: "0791234567", pickupTime: new Date(Date.now() + 3600e3).toISOString(), items }) });
 assert.equal(r.status, 400, "receipt required");
+const fake = new FormData();
+fake.append("file", new Blob(["not really an image"], { type: "image/png" }), "fake.png");
+assert.equal((await fetch(B + "/api/upload", { method: "POST", body: fake })).status, 415, "upload sniffs real image bytes");
 const form = new FormData();
 form.append("file", new Blob([Buffer.from("89504e470d0a1a0a", "hex")], { type: "image/png" }), "r.png");
 const up = await (await fetch(B + "/api/upload", { method: "POST", body: form })).json();
@@ -87,6 +90,9 @@ const pickupId = r.body.id;
 assert.equal(await db.printJob.count({ where: { orderId: pickupId } }), 0, "no print before verify");
 r = await j(`/api/orders/${pickupId}`);
 assert.equal(r.body.status, "pending_verification");
+r = await j(`/api/pos/queue?branchId=${branch.id}`);
+assert.equal(r.body.orders.find((o) => o.id === pickupId)?.status, "pending_verification", "cliq order in POS queue for its branch");
+console.log("cliq order in pos queue ok");
 
 // Bridge auth + verify -> printed
 assert.equal((await j(`/api/print-jobs/pending?branchId=branch-1`)).status, 401, "bridge auth");

@@ -54,6 +54,9 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
   const ready = lines.length > 0 && !blocked && branch.isOpen && nameOk && phoneOk && (dine || !!chosenSlot) && (!needReceipt || !!receipt);
 
   const send = async (file: File) => {
+    // Fast feedback only; the server re-checks the real file bytes.
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return setUpload({ busy: false, error: "Please choose a JPG, PNG or WebP image.", file: null });
+    if (file.size > 5 * 1024 * 1024) return setUpload({ busy: false, error: "That image is larger than 5MB. Please choose a smaller one.", file: null });
     setUpload({ busy: true, error: "", file });
     try {
       const fd = new FormData();
@@ -238,7 +241,7 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
                 <label className="flex min-h-14 cursor-pointer items-center justify-center gap-3 rounded-xl border border-dashed border-sand px-4 py-3 text-center font-medium transition-colors hover:border-ink hover:bg-paper-2 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold">
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     className="sr-only"
                     onChange={(e) => {
                       const f = e.target.files?.[0];
@@ -262,11 +265,14 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
                   )}
                 </p>
               )}
-              <p className="mt-4 text-sm leading-relaxed text-muted">
-                {dine
-                  ? "The cashier checks the transfer, then your order goes to the kitchen."
-                  : "Your order is confirmed, and preparation starts, only after the cashier verifies the transfer. You can follow its status live on the next page."}
-              </p>
+              <p className="mt-1 text-sm text-muted">JPG, PNG or WebP, up to 5MB. A screenshot of the confirmation screen is fine.</p>
+              <div className="mt-5 flex items-start gap-3 rounded-xl border border-line p-4">
+                <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-gold" />
+                <p className="text-sm leading-relaxed text-ink-2">
+                  <span className="font-semibold text-ink">Your order will be sent to the kitchen once the cashier verifies your CliQ transfer.</span>{" "}
+                  {dine ? "This usually takes a minute or two." : "You can follow its status live on the next page."}
+                </p>
+              </div>
             </div>
           </section>
         )}

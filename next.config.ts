@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ["tesseract.js"], // its Node worker script must load from node_modules, not the bundle
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

@@ -223,7 +223,7 @@ export function Menu({ branch, categories, table }: { branch: BranchDTO; categor
         </main>
 
         <aside className="hidden lg:block">
-          <div className="sticky top-[7.5rem] pt-12">
+          <div className="sticky top-[7.5rem] pt-8">
             <CartColumn {...cartProps} />
           </div>
         </aside>

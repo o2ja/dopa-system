@@ -3,7 +3,6 @@ import Link from "next/link";
 import { BranchFacts, StatusBadge, TopBar, Wordmark } from "@/components/customer/Brand";
 import { getBranches, getPopularItems } from "@/components/customer/data";
 import { hoursLabel } from "@/components/customer/hours";
-import { HeroScene } from "@/components/customer/HeroScene";
 import { LandingMotion } from "@/components/customer/LandingMotion";
 import { fromPrice } from "@/components/customer/types";
 import { formatJOD } from "@/lib/money";
@@ -60,8 +59,7 @@ export default async function HomePage() {
           </div>
 
           {popular.length > 0 && (
-            <section id="menu" aria-labelledby="menu-h" data-hero className="relative scroll-mt-6 rounded-card border border-line bg-card p-7 md:p-10">
-              <HeroScene className="absolute -top-10 end-3 size-40 md:-top-14 md:end-6 md:size-52" />
+            <section id="menu" aria-labelledby="menu-h" data-hero className="scroll-mt-6 rounded-card border border-line bg-card p-7 md:p-10">
               <h2 id="menu-h" className="font-display text-3xl font-medium tracking-tight">Most ordered</h2>
               <p className="mt-1 text-muted">What our regulars come back for.</p>
               <ul className="mt-8 space-y-4">
@@ -127,10 +125,11 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <footer className="overflow-hidden border-t border-line">
+      <footer className="border-t border-line">
         <div className={`${frame} pt-16`}>
-          <p data-foot-word className="select-none font-display text-[34vw] font-medium leading-[0.85] tracking-[-0.04em] text-sand md:text-[20rem]" aria-hidden>Dopa</p>
-          <div className="mt-10 grid gap-10 pb-12 sm:grid-cols-2 lg:grid-cols-3">
+          {/* leading >1 keeps the "p" descender inside its own box so it never reaches the columns below */}
+          <p className="select-none font-display text-[clamp(5rem,26vw,16rem)] font-medium leading-[1.1] tracking-[-0.04em] text-sand" aria-hidden>Dopa</p>
+          <div className="mt-8 grid gap-10 border-t border-line pt-10 pb-12 sm:grid-cols-2 lg:grid-cols-3">
             {branches.map((b) => (
               <div key={b.id}>
                 <p className="mb-3 font-display text-xl">{b.name}</p>

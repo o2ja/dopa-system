@@ -1,10 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Banknote, CreditCard, Printer, ShieldCheck, X } from "lucide-react";
+import { Banknote, CreditCard, Printer, RefreshCw, ShieldCheck, X } from "lucide-react";
 import { formatJOD } from "@/lib/money";
 import { ORDER_STATUS_LABEL, PAYMENT_LABEL } from "@/types";
 import { api, hhmm } from "./api";
+import { OcrBadge } from "./OcrCheck";
 import { gsap, reducedMotion, useGSAP, useOverlay } from "./motion";
 import { press, useNow } from "./ui";
 import type { QueueOrder } from "./types";
@@ -81,9 +82,14 @@ export default function QueueDrawer({
           <h2 className="text-lg font-semibold">
             Incoming orders <span className="tabular ms-1 font-normal text-muted">· {orders.length}</span>
           </h2>
-          <button onClick={close} aria-label="Close" className={`grid size-12 place-items-center rounded-full text-muted ${press} active:bg-paper-2`}>
-            <X className="size-6" />
-          </button>
+          <div className="flex items-center">
+            <button onClick={onChanged} aria-label="Refresh orders" className={`grid size-12 place-items-center rounded-full text-muted ${press} active:bg-paper-2`}>
+              <RefreshCw className="size-5" />
+            </button>
+            <button onClick={close} aria-label="Close" className={`grid size-12 place-items-center rounded-full text-muted ${press} active:bg-paper-2`}>
+              <X className="size-6" />
+            </button>
+          </div>
         </div>
 
         <div ref={list} className="scroll-thin min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
@@ -116,6 +122,11 @@ export default function QueueDrawer({
                   {ORDER_STATUS_LABEL[o.status]} · {PAYMENT_LABEL[o.paymentMethod]} · <span className="tabular">{formatJOD(o.total)}</span>
                   {o.customerName && ` · ${o.customerName}`}
                 </p>
+                {pending && o.receiptUrl && (
+                  <div className="mt-2" title={o.receiptVerification?.reasons.join("\n")}>
+                    <OcrBadge v={o.receiptVerification} />
+                  </div>
+                )}
 
                 <ul className="mt-3 space-y-1">
                   {o.items.map((i) => (

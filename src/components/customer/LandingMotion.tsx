@@ -7,7 +7,7 @@ import { gsap, MOTION_OK, ScrollTrigger, SplitText, useGSAP } from "./motion";
 
 /**
  * Landing-page motion: smooth scroll, the hero entrance and ScrollTrigger reveals.
- * Markup hooks: [data-hero-title], [data-hero] (hero parts, in order), [data-reveal] > [data-r] (staggered group), [data-foot-word].
+ * Markup hooks: [data-hero-title], [data-hero] (hero parts, in order), [data-reveal] > [data-r] (staggered group).
  * Everything is added only under no-preference; with reduced motion the page is plain, fully visible and natively scrolled.
  */
 export function LandingMotion({ children }: { children: ReactNode }) {
@@ -43,12 +43,6 @@ export function LandingMotion({ children }: { children: ReactNode }) {
             ease: "power3.out",
             scrollTrigger: { trigger: group, start: "top 82%", once: true },
           });
-        });
-
-        gsap.from("[data-foot-word]", {
-          yPercent: 24,
-          ease: "none",
-          scrollTrigger: { trigger: "[data-foot-word]", start: "top bottom", end: "bottom bottom", scrub: true },
         });
 
         void document.fonts.ready.then(() => ScrollTrigger.refresh());

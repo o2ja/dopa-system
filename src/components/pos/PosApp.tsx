@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, Ban, BellRing, Check, ClipboardList, Loader2, LogOut, Receipt, Vault, Volume2, VolumeX, WifiOff } from "lucide-react";
+import { AlertCircle, Ban, BellRing, Check, ChevronDown, ClipboardList, Loader2, LogOut, Receipt, RefreshCw, ShieldCheck, Vault, Volume2, VolumeX, WifiOff } from "lucide-react";
 import { formatJOD } from "@/lib/money";
 import { PAYMENT_LABEL, type PaymentMethod } from "@/types";
 import { api, hhmm } from "./api";
@@ -105,7 +105,11 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
   useEffect(() => {
     const first = setTimeout(pollQueue, 0);
     const t = setInterval(pollQueue, 3000);
-    return () => (clearTimeout(first), clearInterval(t));
+    // iPad Safari throttles timers in the background: catch up the moment the tab is visible again
+    const wake = () => document.visibilityState === "visible" && pollQueue();
+    document.addEventListener("visibilitychange", wake);
+    window.addEventListener("focus", wake);
+    return () => (clearTimeout(first), clearInterval(t), document.removeEventListener("visibilitychange", wake), window.removeEventListener("focus", wake));
   }, [pollQueue]);
 
   // ---- sound: iOS needs a tap before audio plays; a saved preference re-arms on the first tap
@@ -267,7 +271,13 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
       <header className="flex h-16 shrink-0 items-center gap-1 border-b border-line bg-card px-2 sm:gap-2 sm:px-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 sm:gap-4">
-            <h1 className="truncate font-semibold">{branch.name}</h1>
+            <h1 className="min-w-0">
+              <Link href="/pos?change=1" title="Switch branch" className="flex min-h-11 items-center gap-1 rounded-xl px-2 font-semibold hover:bg-paper-2">
+                <span className="truncate">{branch.name}</span>
+                <ChevronDown className="size-4 shrink-0 text-muted" aria-hidden />
+                <span className="sr-only">· switch branch</span>
+              </Link>
+            </h1>
             <Clock />
             {shift && (
               <span className="hidden items-center gap-2 text-sm text-ink-2 md:flex">
@@ -310,15 +320,40 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
         <HeaderBtn label="Orders" onClick={() => setOverlay({ k: "queue" })} badge={orders.length || undefined} alert={pendingCount > 0} tone="bg-ink text-paper" showLabel>
           <BellRing className="size-5" />
         </HeaderBtn>
-        <Link href="/pos?change=1" className="hidden h-11 items-center rounded-xl px-3 text-sm text-muted hover:bg-paper-2 lg:flex">
-          Switch branch
-        </Link>
         <span className="hidden sm:contents">
           <HeaderBtn label="Sign out" onClick={signOut} tone="text-muted hover:bg-paper-2">
             <LogOut className="size-5" />
           </HeaderBtn>
         </span>
       </header>
+
+      {pendingCount > 0 && (
+        <section aria-label="Pending CliQ verification" className="shrink-0 border-b border-gold/40 bg-paper-2">
+          <div className="flex items-center gap-3 overflow-x-auto px-2 py-2 sm:px-4">
+            <h2 className="flex shrink-0 items-center gap-2 text-sm font-semibold text-gold-2">
+              <ShieldCheck className="size-4" aria-hidden /> Pending CliQ verification
+              <span className="tabular font-normal">· {pendingCount}</span>
+            </h2>
+            {orders
+              .filter((o) => o.status === "pending_verification")
+              .map((o) => (
+                <button
+                  key={o.id}
+                  onClick={() => setOverlay({ k: "verify", order: o })}
+                  className={`flex h-11 shrink-0 items-center gap-2 rounded-xl border border-gold bg-card px-4 text-sm ${press}`}
+                >
+                  <span className="tabular font-semibold">#{o.number}</span>
+                  {o.customerName && <span className="max-w-32 truncate text-ink-2">{o.customerName}</span>}
+                  <span className="tabular text-muted">{formatJOD(o.total)}</span>
+                  <span className="font-semibold">Verify</span>
+                </button>
+              ))}
+            <button onClick={pollQueue} aria-label="Refresh orders" className={`ms-auto grid size-11 shrink-0 place-items-center rounded-xl text-muted hover:bg-card ${press}`}>
+              <RefreshCw className="size-4" />
+            </button>
+          </div>
+        </section>
+      )}
 
       {shift === undefined || !categories ? (
         <div className="grid flex-1 place-items-center text-muted">
@@ -378,7 +413,7 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
       )}
       {overlay?.k === "verify" && (
         <VerifyModal
-          order={overlay.order}
+          order={orders.find((o) => o.id === overlay.order.id) ?? overlay.order}
           branch={branch}
           onClose={() => setOverlay({ k: "queue" })}
           onDone={(msg) => {

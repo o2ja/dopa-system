@@ -1,4 +1,4 @@
-import type { OrderSource, OrderStatus, PaymentMethod, PaymentStatus } from "@/types";
+import type { OrderSource, OrderStatus, PaymentMethod, PaymentStatus, ReceiptVerification } from "@/types";
 
 export interface PosBranch {
   id: string;
@@ -39,6 +39,7 @@ export interface QueueOrder {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   receiptUrl: string | null;
+  receiptVerification: ReceiptVerification | null;
   tableNumber: number | null;
   customerName: string | null;
   customerPhone: string | null;
