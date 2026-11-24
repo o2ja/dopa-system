@@ -1,19 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { safeEqual, staffToken, STAFF_COOKIE } from "@/app/api/auth/_token";
 
-// Staff areas behind HTTP Basic auth (works on iPad Safari, remembered per device).
+// Staff areas behind a shared-password login (cookie set by /api/auth/login).
 // shortcut: one shared STAFF_PASSWORD for all staff; upgrade to per-user PINs + roles when needed.
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const pass = process.env.STAFF_PASSWORD;
   if (!pass) return NextResponse.next(); // unset = open (local dev only)
-  let given = "";
-  try {
-    given = atob((req.headers.get("authorization") ?? "").replace(/^Basic /, "")).split(":").slice(1).join(":");
-  } catch {}
-  if (given === pass) return NextResponse.next();
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Dopa Staff"' },
-  });
+  const given = req.cookies.get(STAFF_COOKIE)?.value ?? "";
+  if (safeEqual(given, await staffToken(pass))) return NextResponse.next();
+
+  const { pathname, search } = req.nextUrl;
+  if (pathname.startsWith("/api/")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const url = req.nextUrl.clone();
+  url.pathname = "/login";
+  url.search = `?next=${encodeURIComponent(pathname + search)}`;
+  return NextResponse.redirect(url);
 }
 
 export const config = {

@@ -5,15 +5,40 @@ import { PrismaClient } from "@prisma/client";
 
 const B = process.argv[2] ?? "http://localhost:3000";
 const SECRET = process.env.BRIDGE_SECRET ?? "dev-bridge-secret";
+const PASS = process.env.STAFF_PASSWORD;
 const db = new PrismaClient();
+let staff = {}; // staff cookie header, set after login when the gate is on
+const isStaffPath = (p) => /^\/(pos|admin|api\/(pos|admin|shifts))(\/|\?|$)/.test(p);
 const j = async (path, init = {}) => {
-  const r = await fetch(B + path, { ...init, headers: { "content-type": "application/json", ...init.headers } });
+  const r = await fetch(B + path, { ...init, headers: { "content-type": "application/json", ...(isStaffPath(path) ? staff : {}), ...init.headers } });
   const body = await r.json().catch(() => null);
   return { status: r.status, body };
 };
 
+assert.equal((await fetch(B + "/login")).status, 200, "/login");
+const mf = await fetch(B + "/manifest.json");
+assert.equal(mf.status, 200, "manifest");
+assert.match((await mf.json()).name, /Dopa/, "manifest name");
+
+if (PASS) {
+  let r = await fetch(B + "/pos", { redirect: "manual" });
+  assert.equal(r.status, 307, "/pos gated");
+  assert.match(r.headers.get("location") ?? "", /\/login/);
+  r = await fetch(B + "/api/pos/queue?branchId=branch-1");
+  assert.equal(r.status, 401, "staff api gated");
+  const login = (password) => fetch(B + "/api/auth/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password }) });
+  assert.equal((await login(PASS + "x")).status, 401, "wrong password");
+  r = await login(PASS);
+  assert.equal(r.status, 200, "login");
+  const cookie = r.headers.getSetCookie().find((c) => c.startsWith("dopa_staff="));
+  assert.ok(cookie, "dopa_staff cookie set");
+  assert.ok(!cookie.includes(PASS), "cookie is not the raw password");
+  staff = { cookie: cookie.split(";")[0] };
+  console.log("gate ok");
+}
+
 for (const p of ["/", "/b/branch-1?table=5", "/b/branch-2", "/pos", "/pos?branch=branch-1", "/admin", "/admin/menu", "/admin/branches", "/admin/qr"]) {
-  const r = await fetch(B + p);
+  const r = await fetch(B + p, { headers: isStaffPath(p) ? staff : {} });
   assert.equal(r.status, 200, p);
 }
 console.log("pages ok");
