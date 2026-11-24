@@ -1,5 +1,7 @@
 ﻿import { db } from "@/lib/db";
+import { after } from "next/server";
 import { dispatchPrintJobs } from "@/lib/print-dispatcher";
+import { verifyReceipt } from "@/lib/receipt-ocr";
 import type { CreateOrderInput, OrderItemModifier, OrderStatus, PaymentStatus } from "@/types";
 
 export class OrderError extends Error {
@@ -137,6 +139,7 @@ export async function createOrder(input: CreateOrderInput) {
   });
 
   if (!needsVerification) await dispatchPrintJobs(order.id);
+  if (order.receiptUrl) after(() => verifyReceipt(order.id)); // OCR runs after the response, never delays checkout
   return order;
 }
 

@@ -413,7 +413,7 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
       )}
       {overlay?.k === "verify" && (
         <VerifyModal
-          order={overlay.order}
+          order={orders.find((o) => o.id === overlay.order.id) ?? overlay.order}
           branch={branch}
           onClose={() => setOverlay({ k: "queue" })}
           onDone={(msg) => {

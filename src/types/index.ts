@@ -13,6 +13,21 @@ export type OrderStatus =
   | "cancelled";
 export type PaymentMethod = "cash" | "cliq" | "card";
 export type PaymentStatus = "unpaid" | "pending_verification" | "paid" | "rejected";
+
+/** Local OCR pre-check of a CliQ receipt. Advisory only: the cashier still decides. */
+export interface ReceiptVerification {
+  status: "verified" | "warning" | "failed";
+  checks: {
+    isCompleted: boolean;
+    isPreConfirmScreen: boolean;
+    amountMatched: boolean;
+    extractedAmount: number | null; // JOD
+    aliasMatched: boolean;
+    isDuplicate: boolean;
+  };
+  reasons: string[];
+  rawSnippet: string;
+}
 export type CategoryKind = "coffee" | "restaurant";
 
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {

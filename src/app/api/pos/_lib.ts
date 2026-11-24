@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { OrderError } from "@/lib/orders";
-import type { OrderItemModifier } from "@/types";
+import type { OrderItemModifier, ReceiptVerification } from "@/types";
 
 export const bad = (error: string, status = 400) => NextResponse.json({ error }, { status });
 
@@ -48,6 +48,7 @@ export function toOrderDTO(o: OrderRow) {
     paymentMethod: o.paymentMethod,
     paymentStatus: o.paymentStatus,
     receiptUrl: o.receiptUrl,
+    receiptVerification: o.receiptVerification ? (JSON.parse(o.receiptVerification) as ReceiptVerification) : null,
     tableNumber: o.tableNumber,
     customerName: o.customerName,
     customerPhone: o.customerPhone,

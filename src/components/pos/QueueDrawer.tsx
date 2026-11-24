@@ -5,6 +5,7 @@ import { Banknote, CreditCard, Printer, RefreshCw, ShieldCheck, X } from "lucide
 import { formatJOD } from "@/lib/money";
 import { ORDER_STATUS_LABEL, PAYMENT_LABEL } from "@/types";
 import { api, hhmm } from "./api";
+import { OcrBadge } from "./OcrCheck";
 import { gsap, reducedMotion, useGSAP, useOverlay } from "./motion";
 import { press, useNow } from "./ui";
 import type { QueueOrder } from "./types";
@@ -121,6 +122,11 @@ export default function QueueDrawer({
                   {ORDER_STATUS_LABEL[o.status]} · {PAYMENT_LABEL[o.paymentMethod]} · <span className="tabular">{formatJOD(o.total)}</span>
                   {o.customerName && ` · ${o.customerName}`}
                 </p>
+                {pending && o.receiptUrl && (
+                  <div className="mt-2" title={o.receiptVerification?.reasons.join("\n")}>
+                    <OcrBadge v={o.receiptVerification} />
+                  </div>
+                )}
 
                 <ul className="mt-3 space-y-1">
                   {o.items.map((i) => (

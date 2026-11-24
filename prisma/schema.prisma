@@ -143,6 +143,8 @@ model Order {
   paymentMethod String    // cash | cliq | card
   paymentStatus String    // unpaid | pending_verification | paid | rejected
   receiptUrl    String?
+  receiptHash   String?   // SHA-256 of the receipt image, catches reused screenshots
+  receiptVerification String? // JSON ReceiptVerification from the local OCR pre-check
   tableNumber   Int?
   customerName  String?
   customerPhone String?
@@ -162,6 +164,7 @@ model Order {
 
   @@index([branchId, status])
   @@index([branchId, createdAt])
+  @@index([receiptHash])
 }
 
 model OrderItem {
