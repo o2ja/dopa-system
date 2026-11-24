@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local data
+/prisma/*.db*
+/public/uploads/
+/print-bridge/debug-receipts/
+/print-bridge/.env
+/print-bridge/node_modules/

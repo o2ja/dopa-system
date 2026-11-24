@@ -1,0 +1,212 @@
+// SQLite locally. For the VPS: change provider to "postgresql" or "mysql" and DATABASE_URL.
+// String "enums" (SQLite has none); allowed values live in src/types/index.ts.
+// Money is stored as Int fils (1 JOD = 1000 fils).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Branch {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  nameAr           String
+  nameEn           String
+  addressAr        String   @default("")
+  phone            String   @default("")
+  hours            String   @default("") // e.g. "08:00-24:00"
+  isOpen           Boolean  @default(true)
+  cliqAlias        String
+  cliqName         String   @default("")
+  coffeePrinterIp  String   @default("")
+  kitchenPrinterIp String   @default("")
+  cashierPrinterIp String   @default("")
+  tableCount       Int      @default(20)
+  createdAt        DateTime @default(now())
+
+  availability BranchItemAvailability[]
+  shifts       Shift[]
+  orders       Order[]
+  printJobs    PrintJob[]
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  nameAr    String
+  nameEn    String
+  kind      String     // coffee | restaurant
+  sortOrder Int        @default(0)
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  categoryId  String
+  nameAr      String
+  nameEn      String
+  descAr      String   @default("")
+  image       String?
+  basePrice   Int      // fils; used when item has no variants
+  station     String   // coffee | kitchen
+  isActive    Boolean  @default(true)
+  isPopular   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants       Variant[]
+  modifierGroups ModifierGroup[]
+  availability   BranchItemAvailability[]
+  orderItems     OrderItem[]
+
+  @@index([categoryId])
+}
+
+model Variant {
+  id        String  @id @default(cuid())
+  itemId    String
+  nameAr    String
+  nameEn    String  // S | M | L | Regular | Meal
+  price     Int     // absolute price in fils (replaces basePrice)
+  isDefault Boolean @default(false)
+  sortOrder Int     @default(0)
+
+  item MenuItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+}
+
+model ModifierGroup {
+  id        String     @id @default(cuid())
+  nameAr    String
+  nameEn    String
+  minSelect Int        @default(0)
+  maxSelect Int        @default(1)
+  sortOrder Int        @default(0)
+  modifiers Modifier[]
+  items     MenuItem[]
+}
+
+model Modifier {
+  id      String @id @default(cuid())
+  groupId String
+  nameAr  String
+  nameEn  String
+  price   Int    @default(0) // extra fils
+
+  group ModifierGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+}
+
+// Quick 86: a row with isAvailable=false hides the item at that branch only. No row = available.
+model BranchItemAvailability {
+  branchId    String
+  itemId      String
+  isAvailable Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+
+  branch Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  item   MenuItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@id([branchId, itemId])
+}
+
+model Shift {
+  id           String    @id @default(cuid())
+  branchId     String
+  cashierName  String
+  status       String    @default("open") // open | closed
+  openingFloat Int       // العُهدة, fils
+  openedAt     DateTime  @default(now())
+  closedAt     DateTime?
+  cashSales    Int       @default(0) // filled on close (Z-Report)
+  cliqSales    Int       @default(0)
+  cardSales    Int       @default(0)
+  orderCount   Int       @default(0)
+  expectedCash Int?
+  actualCash   Int?
+  variance     Int?
+  notes        String?
+
+  branch Branch  @relation(fields: [branchId], references: [id])
+  orders Order[]
+
+  @@index([branchId, status])
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  number        Int       // per-branch daily display number
+  branchId      String
+  shiftId       String?
+  source        String    // pos | qr | pickup
+  status        String    // pending_verification | received | preparing | ready | completed | rejected | cancelled
+  paymentMethod String    // cash | cliq | card
+  paymentStatus String    // unpaid | pending_verification | paid | rejected
+  receiptUrl    String?
+  tableNumber   Int?
+  customerName  String?
+  customerPhone String?
+  pickupTime    DateTime?
+  notes         String?
+  rejectReason  String?
+  subtotal      Int
+  total         Int
+  verifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  branch    Branch      @relation(fields: [branchId], references: [id])
+  shift     Shift?      @relation(fields: [shiftId], references: [id])
+  items     OrderItem[]
+  printJobs PrintJob[]
+
+  @@index([branchId, status])
+  @@index([branchId, createdAt])
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  menuItemId String
+  nameAr     String  // snapshots: menu edits never rewrite history
+  nameEn     String
+  variantId  String?
+  variantAr  String?
+  modifiers  String  @default("[]") // JSON: {id,nameAr,nameEn,price}[]
+  station    String
+  quantity   Int
+  unitPrice  Int     // variant/base + modifiers, fils
+  lineTotal  Int
+  notes      String?
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@index([orderId])
+}
+
+model PrintJob {
+  id             String    @id @default(cuid())
+  branchId       String
+  orderId        String?
+  station        String    // coffee | kitchen | cashier
+  jobType        String    // ticket | receipt | open_drawer
+  payload        String    @default("{}") // JSON PrintPayload
+  openCashDrawer Boolean   @default(false)
+  status         String    @default("pending") // pending | printed | failed
+  attempts       Int       @default(0)
+  errorMessage   String?
+  createdAt      DateTime  @default(now())
+  printedAt      DateTime?
+
+  branch Branch @relation(fields: [branchId], references: [id])
+  order  Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([branchId, status])
+}
