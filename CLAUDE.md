@@ -44,6 +44,11 @@ Everything runs locally now and deploys cleanly to a single **VPS (Ubuntu)** lat
 - **Sonnet Agent C (Admin Panel + Print Bridge):** `src/app/admin/**`, `src/components/admin/**`, `src/app/api/admin/**`, `src/app/api/print-jobs/**`, `print-bridge/**`
 
 ## 6. Visual Direction
-- Primary Language: **Arabic (`dir="rtl"`, `lang="ar"`)** with clean English labels where natural (S/M/L, POS, QR, CliQ).
-- Aesthetic: Warm, editorial hospitality design (Warm Off-White, Deep Navy/Charcoal, Muted Sand/Gold, crisp typography like `IBM Plex Sans Arabic` or `Cairo`).
+- **100% English only — no Arabic anywhere** (UI, seed data, receipts, print tickets). `<html lang="en" dir="ltr">`, font Plus Jakarta Sans.
+- **Fully responsive on phones, tablets AND laptop/desktop** for every portal (`/`, `/b/[slug]`, `/pos`, `/admin`): drawers/collapsible sidebars on mobile, touch-friendly on iPad, keyboard/mouse ergonomics on desktop.
+- Aesthetic: Warm, editorial hospitality design (Warm Off-White, Deep Navy/Charcoal, Muted Sand/Gold).
 - **Strictly NO bright orange** and no generic glossy AI styling.
+
+## 7. Git Workflow
+- Remote: `https://github.com/o2ja/dopa-system.git`. One feature branch per wave, conventional commits (`feat:`, `fix:`, `chore:`), push, then PR + merge via `gh` (or a clean merge into `main` + push) after each verified wave.
+- Docker is available. SQLite stays the local default; add `docker-compose.yml` (Postgres) when moving toward the VPS.

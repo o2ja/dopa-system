@@ -10,10 +10,10 @@ const MAX_BYTES = 6 * 1024 * 1024;
 export async function POST(req: Request) {
   const form = await req.formData().catch(() => null);
   const file = form?.get("file");
-  if (!(file instanceof File)) return Response.json({ error: "لم يتم إرفاق ملف" }, { status: 400 });
+  if (!(file instanceof File)) return Response.json({ error: "No file attached" }, { status: 400 });
   const ext = EXT[file.type];
-  if (!ext) return Response.json({ error: "يُسمح بالصور فقط (JPG, PNG, WEBP, HEIC)" }, { status: 415 });
-  if (file.size > MAX_BYTES) return Response.json({ error: "حجم الصورة يتجاوز 6MB" }, { status: 413 });
+  if (!ext) return Response.json({ error: "Images only (JPG, PNG, WEBP, HEIC)" }, { status: 415 });
+  if (file.size > MAX_BYTES) return Response.json({ error: "Image is larger than 6MB" }, { status: 413 });
 
   const name = `${Date.now()}-${randomUUID().slice(0, 8)}.${ext}`;
   await mkdir(UPLOAD_DIR, { recursive: true });

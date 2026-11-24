@@ -14,9 +14,8 @@ datasource db {
 model Branch {
   id               String   @id @default(cuid())
   slug             String   @unique
-  nameAr           String
-  nameEn           String
-  addressAr        String   @default("")
+  name             String
+  address          String   @default("")
   phone            String   @default("")
   hours            String   @default("") // e.g. "08:00-24:00"
   isOpen           Boolean  @default(true)
@@ -36,8 +35,7 @@ model Branch {
 
 model Category {
   id        String     @id @default(cuid())
-  nameAr    String
-  nameEn    String
+  name             String
   kind      String     // coffee | restaurant
   sortOrder Int        @default(0)
   items     MenuItem[]
@@ -46,9 +44,8 @@ model Category {
 model MenuItem {
   id          String   @id @default(cuid())
   categoryId  String
-  nameAr      String
-  nameEn      String
-  descAr      String   @default("")
+  name             String
+  description      String   @default("")
   image       String?
   basePrice   Int      // fils; used when item has no variants
   station     String   // coffee | kitchen
@@ -69,8 +66,7 @@ model MenuItem {
 model Variant {
   id        String  @id @default(cuid())
   itemId    String
-  nameAr    String
-  nameEn    String  // S | M | L | Regular | Meal
+  name             String
   price     Int     // absolute price in fils (replaces basePrice)
   isDefault Boolean @default(false)
   sortOrder Int     @default(0)
@@ -82,8 +78,7 @@ model Variant {
 
 model ModifierGroup {
   id        String     @id @default(cuid())
-  nameAr    String
-  nameEn    String
+  name             String
   minSelect Int        @default(0)
   maxSelect Int        @default(1)
   sortOrder Int        @default(0)
@@ -94,8 +89,7 @@ model ModifierGroup {
 model Modifier {
   id      String @id @default(cuid())
   groupId String
-  nameAr  String
-  nameEn  String
+  name             String
   price   Int    @default(0) // extra fils
 
   group ModifierGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -121,7 +115,7 @@ model Shift {
   branchId     String
   cashierName  String
   status       String    @default("open") // open | closed
-  openingFloat Int       // العُهدة, fils
+  openingFloat Int       // opening cash float, fils
   openedAt     DateTime  @default(now())
   closedAt     DateTime?
   cashSales    Int       @default(0) // filled on close (Z-Report)
@@ -174,11 +168,10 @@ model OrderItem {
   id         String  @id @default(cuid())
   orderId    String
   menuItemId String
-  nameAr     String  // snapshots: menu edits never rewrite history
-  nameEn     String
+  name       String  // snapshot: menu edits never rewrite history
   variantId  String?
-  variantAr  String?
-  modifiers  String  @default("[]") // JSON: {id,nameAr,nameEn,price}[]
+  variantName String?
+  modifiers  String  @default("[]") // JSON: {id,name,price}[]
   station    String
   quantity   Int
   unitPrice  Int     // variant/base + modifiers, fils

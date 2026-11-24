@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+﻿import { db } from "@/lib/db";
 import { dispatchPrintJobs } from "@/lib/print-dispatcher";
 import type { CreateOrderInput, OrderItemModifier, OrderStatus, PaymentStatus } from "@/types";
 
@@ -23,22 +23,22 @@ const startOfToday = () => {
  */
 export async function createOrder(input: CreateOrderInput) {
   const { branchId, source, paymentMethod } = input;
-  if (!["pos", "qr", "pickup"].includes(source)) throw new OrderError("مصدر طلب غير صالح");
-  if (!["cash", "cliq", "card"].includes(paymentMethod)) throw new OrderError("طريقة دفع غير صالحة");
-  if (!Array.isArray(input.items) || input.items.length === 0) throw new OrderError("السلة فارغة");
-  if (input.items.length > 50) throw new OrderError("عدد الأصناف كبير جداً");
-  if (source !== "pos" && paymentMethod === "card") throw new OrderError("الدفع بالبطاقة متاح في الكاشير فقط");
-  if (source === "pickup" && paymentMethod !== "cliq") throw new OrderError("طلبات الاستلام تتطلب الدفع المسبق عبر CliQ");
-  if (source !== "pos" && paymentMethod === "cliq" && !input.receiptUrl) throw new OrderError("يرجى رفع صورة إيصال CliQ");
-  if (input.receiptUrl && !input.receiptUrl.startsWith("/api/upload/")) throw new OrderError("رابط إيصال غير صالح");
+  if (!["pos", "qr", "pickup"].includes(source)) throw new OrderError("Invalid order source");
+  if (!["cash", "cliq", "card"].includes(paymentMethod)) throw new OrderError("Invalid payment method");
+  if (!Array.isArray(input.items) || input.items.length === 0) throw new OrderError("Your cart is empty");
+  if (input.items.length > 50) throw new OrderError("Too many items in one order");
+  if (source !== "pos" && paymentMethod === "card") throw new OrderError("Card payment is only available at the counter");
+  if (source === "pickup" && paymentMethod !== "cliq") throw new OrderError("Pickup orders must be prepaid with CliQ");
+  if (source !== "pos" && paymentMethod === "cliq" && !input.receiptUrl) throw new OrderError("Please upload your CliQ receipt");
+  if (input.receiptUrl && !input.receiptUrl.startsWith("/api/upload/")) throw new OrderError("Invalid receipt link");
 
   const branch = await db.branch.findUnique({ where: { id: branchId } });
-  if (!branch) throw new OrderError("الفرع غير موجود", 404);
-  if (source !== "pos" && !branch.isOpen) throw new OrderError("الفرع مغلق حالياً");
+  if (!branch) throw new OrderError("Branch not found", 404);
+  if (source !== "pos" && !branch.isOpen) throw new OrderError("This branch is closed right now");
 
   const table = input.tableNumber ?? null;
   if (source === "qr" && (!Number.isInteger(table) || table! < 1 || table! > branch.tableCount))
-    throw new OrderError("رقم الطاولة غير صالح");
+    throw new OrderError("Invalid table number");
 
   const itemIds = [...new Set(input.items.map((l) => l.menuItemId))];
   const menuItems = await db.menuItem.findMany({
@@ -53,10 +53,10 @@ export async function createOrder(input: CreateOrderInput) {
 
   const lines = input.items.map((line) => {
     const item = byId.get(line.menuItemId);
-    if (!item || !item.isActive) throw new OrderError("صنف غير متوفر");
-    if (item.availability[0]?.isAvailable === false) throw new OrderError(`نفد: ${item.nameAr}`);
+    if (!item || !item.isActive) throw new OrderError("Item not available");
+    if (item.availability[0]?.isAvailable === false) throw new OrderError(`Sold out: ${item.name}`);
     const qty = line.quantity;
-    if (!Number.isInteger(qty) || qty < 1 || qty > 99) throw new OrderError("كمية غير صالحة");
+    if (!Number.isInteger(qty) || qty < 1 || qty > 99) throw new OrderError("Invalid quantity");
 
     let unit = item.basePrice;
     let variant: (typeof item.variants)[number] | undefined;
@@ -64,7 +64,7 @@ export async function createOrder(input: CreateOrderInput) {
       variant = line.variantId
         ? item.variants.find((v) => v.id === line.variantId)
         : item.variants.find((v) => v.isDefault) ?? item.variants[0];
-      if (!variant) throw new OrderError(`حجم غير صالح: ${item.nameAr}`);
+      if (!variant) throw new OrderError(`Invalid option for ${item.name}`);
       unit = variant.price;
     }
 
@@ -73,21 +73,20 @@ export async function createOrder(input: CreateOrderInput) {
     for (const group of item.modifierGroups) {
       const chosen = group.modifiers.filter((m) => picked.has(m.id));
       if (chosen.length < group.minSelect || chosen.length > group.maxSelect)
-        throw new OrderError(`اختيار غير صالح: ${group.nameAr}`);
+        throw new OrderError(`Invalid selection for ${group.name}`);
       chosen.forEach((m) => {
         picked.delete(m.id);
-        mods.push({ id: m.id, nameAr: m.nameAr, nameEn: m.nameEn, price: m.price });
+        mods.push({ id: m.id, name: m.name, price: m.price });
         unit += m.price;
       });
     }
-    if (picked.size) throw new OrderError("إضافة غير صالحة");
+    if (picked.size) throw new OrderError("Invalid add-on");
 
     return {
       menuItemId: item.id,
-      nameAr: item.nameAr,
-      nameEn: item.nameEn,
+      name: item.name,
       variantId: variant?.id ?? null,
-      variantAr: variant?.nameAr ?? null,
+      variantName: variant?.name ?? null,
       modifiers: JSON.stringify(mods),
       station: item.station,
       quantity: qty,
@@ -108,7 +107,7 @@ export async function createOrder(input: CreateOrderInput) {
     const open = await db.shift.findFirst({ where: { branchId, status: "open" }, orderBy: { openedAt: "desc" } });
     shiftId = open?.id ?? null;
   }
-  if (source === "pos" && !shiftId) throw new OrderError("افتح وردية أولاً");
+  if (source === "pos" && !shiftId) throw new OrderError("Open a shift first");
 
   // shortcut: daily number = today's count + 1 inside a transaction; SQLite serializes writes so it's safe here.
   // On Postgres/MySQL with many concurrent tills, switch to a per-branch counter row with UPDATE ... RETURNING.
@@ -144,8 +143,8 @@ export async function createOrder(input: CreateOrderInput) {
 /** Cashier approves/rejects a CliQ order. Approval marks it paid and sends it to the printers. */
 export async function verifyOrder(orderId: string, approve: boolean, reason?: string) {
   const order = await db.order.findUnique({ where: { id: orderId } });
-  if (!order) throw new OrderError("الطلب غير موجود", 404);
-  if (order.status !== "pending_verification") throw new OrderError("تمت معالجة هذا الطلب مسبقاً", 409);
+  if (!order) throw new OrderError("Order not found", 404);
+  if (order.status !== "pending_verification") throw new OrderError("This order was already handled", 409);
 
   if (!approve) {
     return db.order.update({

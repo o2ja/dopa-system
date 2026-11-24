@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import type { OrderItemModifier, PrintPayload, Station } from "@/types";
 
-const TICKET_TITLE: Record<Station, string> = { coffee: "تذكرة الكوفي", kitchen: "تذكرة المطبخ" };
+const TICKET_TITLE: Record<Station, string> = { coffee: "COFFEE TICKET", kitchen: "KITCHEN TICKET" };
 
 /**
  * Splits an order into print jobs: one prep ticket per station that has items
@@ -18,7 +18,7 @@ export async function dispatchPrintJobs(orderId: string, opts: { reprint?: boole
   if (order._count.printJobs > 0 && !opts.reprint) return [];
 
   const base = {
-    branchName: order.branch.nameAr,
+    branchName: order.branch.name,
     orderNumber: order.number,
     source: order.source as PrintPayload["source"],
     tableNumber: order.tableNumber,
@@ -29,10 +29,9 @@ export async function dispatchPrintJobs(orderId: string, opts: { reprint?: boole
     reprint: !!opts.reprint,
   };
   const toLine = (i: (typeof order.items)[number]) => ({
-    nameAr: i.nameAr,
-    nameEn: i.nameEn,
-    variant: i.variantAr,
-    modifiers: (JSON.parse(i.modifiers) as OrderItemModifier[]).map((m) => m.nameAr),
+    name: i.name,
+    variant: i.variantName,
+    modifiers: (JSON.parse(i.modifiers) as OrderItemModifier[]).map((m) => m.name),
     quantity: i.quantity,
     notes: i.notes,
     lineTotal: i.lineTotal,
@@ -50,7 +49,7 @@ export async function dispatchPrintJobs(orderId: string, opts: { reprint?: boole
     openCashDrawer: !opts.reprint && order.paymentMethod === "cash" && order.paymentStatus === "paid",
     payload: {
       ...base,
-      title: "فاتورة الزبون",
+      title: "CUSTOMER RECEIPT",
       paymentMethod: order.paymentMethod as PrintPayload["paymentMethod"],
       items: order.items.map(toLine),
       subtotal: order.subtotal,
@@ -67,9 +66,9 @@ export async function dispatchPrintJobs(orderId: string, opts: { reprint?: boole
   );
 }
 
-/** Manual "فتح درج الكاش": drawer pulse only, on the cashier printer. */
+/** Manual "Open cash drawer": drawer pulse only, on the cashier printer. */
 export function openCashDrawer(branchId: string) {
-  const payload: PrintPayload = { title: "فتح درج الكاش", branchName: "", createdAt: new Date().toISOString(), items: [] };
+  const payload: PrintPayload = { title: "OPEN DRAWER", branchName: "", createdAt: new Date().toISOString(), items: [] };
   return db.printJob.create({
     data: { branchId, station: "cashier", jobType: "open_drawer", openCashDrawer: true, payload: JSON.stringify(payload) },
   });

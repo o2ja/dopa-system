@@ -19,86 +19,86 @@ async function main() {
   const [b1] = await Promise.all([
     db.branch.create({
       data: {
-        slug: "branch-1", nameAr: "دوبا — جبل عمّان", nameEn: "Dopa · Jabal Amman",
-        addressAr: "شارع الرينبو، جبل عمّان", phone: "0790000001", hours: "08:00-24:00",
-        cliqAlias: "DOPAJA", cliqName: "Dopa Cafe House LLC",
+        slug: "branch-1", name: "Dopa · Jabal Amman", address: "Rainbow Street, Jabal Amman",
+        phone: "0790000001", hours: "08:00-24:00", cliqAlias: "DOPAJA", cliqName: "Dopa Cafe House LLC",
         coffeePrinterIp: "192.168.1.101", kitchenPrinterIp: "192.168.1.102", cashierPrinterIp: "192.168.1.103",
       },
     }),
     db.branch.create({
       data: {
-        slug: "branch-2", nameAr: "دوبا — الجامعة", nameEn: "Dopa · University St.",
-        addressAr: "شارع الجامعة الأردنية، مقابل البوابة الرئيسية", phone: "0790000002", hours: "07:00-01:00",
-        cliqAlias: "DOPAUNI", cliqName: "Dopa Cafe House LLC", tableCount: 16,
+        slug: "branch-2", name: "Dopa · University St.", address: "University Street, opposite the main gate",
+        phone: "0790000002", hours: "07:00-01:00", cliqAlias: "DOPAUNI", cliqName: "Dopa Cafe House LLC", tableCount: 16,
         coffeePrinterIp: "192.168.2.101", kitchenPrinterIp: "192.168.2.102", cashierPrinterIp: "192.168.2.103",
       },
     }),
   ]);
 
-  const group = (nameAr: string, nameEn: string, minSelect: number, maxSelect: number, mods: [string, string, number][]) =>
+  const group = (name: string, minSelect: number, maxSelect: number, mods: [string, number][]) =>
     db.modifierGroup.create({
-      data: { nameAr, nameEn, minSelect, maxSelect, modifiers: { create: mods.map(([nameAr, nameEn, p]) => ({ nameAr, nameEn, price: jd(p) })) } },
+      data: { name, minSelect, maxSelect, modifiers: { create: mods.map(([name, p]) => ({ name, price: jd(p) })) } },
     });
 
-  const milk = await group("نوع الحليب", "Milk", 0, 1, [["حليب كامل الدسم", "Whole", 0], ["حليب الشوفان", "Oat", 0.5], ["حليب اللوز", "Almond", 0.5], ["خالي اللاكتوز", "Lactose-free", 0.35]]);
-  const sugar = await group("السكر", "Sugar", 0, 1, [["بدون سكر", "No sugar", 0], ["سكر خفيف", "Light", 0], ["سكر وسط", "Medium", 0], ["سكر زيادة", "Extra", 0]]);
-  const shot = await group("إضافات القهوة", "Coffee extras", 0, 3, [["شوت إسبريسو إضافي", "Extra shot", 0.5], ["سيروب فانيلا", "Vanilla syrup", 0.35], ["سيروب كراميل", "Caramel syrup", 0.35], ["ديكاف", "Decaf", 0]]);
-  const burgerX = await group("تعديلات", "Adjustments", 0, 4, [["بدون بصل", "No onions", 0], ["بدون مخلل", "No pickles", 0], ["جبنة إضافية", "Extra cheese", 0.5], ["لحم إضافي", "Extra patty", 1.75]]);
-  const sauces = await group("الصوصات", "Sauces", 0, 2, [["صوص دوبا الخاص", "Dopa sauce", 0], ["ثومية", "Garlic", 0], ["باربكيو", "BBQ", 0], ["هالبينو حار", "Spicy jalapeño", 0.25]]);
-  const crust = await group("العجينة", "Crust", 1, 1, [["رقيقة", "Thin", 0], ["إيطالية سميكة", "Thick", 0.5]]);
+  const milk = await group("Milk", 0, 1, [["Whole milk", 0], ["Oat milk", 0.5], ["Almond milk", 0.5], ["Lactose-free", 0.35]]);
+  const sugar = await group("Sugar", 0, 1, [["No sugar", 0], ["Light", 0], ["Medium", 0], ["Extra sweet", 0]]);
+  const extras = await group("Coffee extras", 0, 3, [["Extra shot", 0.5], ["Vanilla syrup", 0.35], ["Caramel syrup", 0.35], ["Decaf", 0]]);
+  const burgerX = await group("Adjustments", 0, 4, [["No onions", 0], ["No pickles", 0], ["Extra cheese", 0.5], ["Extra patty", 1.75]]);
+  const sauces = await group("Sauces", 0, 2, [["Dopa sauce", 0], ["Garlic", 0], ["BBQ", 0], ["Spicy jalapeño", 0.25]]);
+  const crust = await group("Crust", 1, 1, [["Thin", 0], ["Thick", 0.5]]);
 
-  const cat = (nameAr: string, nameEn: string, kind: string, sortOrder: number) => db.category.create({ data: { nameAr, nameEn, kind, sortOrder } });
-  const hot = await cat("القهوة الساخنة", "Hot Coffee", "coffee", 1);
-  const cold = await cat("المشروبات الباردة", "Cold Drinks", "coffee", 2);
-  const sweets = await cat("الحلويات", "Sweets", "coffee", 3);
-  const breakfast = await cat("الفطور", "Breakfast", "restaurant", 4);
-  const pizza = await cat("البيتزا", "Pizza", "restaurant", 5);
-  const burgers = await cat("البرغر والساندويش", "Burgers & Sandwiches", "restaurant", 6);
-  const pasta = await cat("الباستا والسلطات", "Pasta & Salads", "restaurant", 7);
+  const cat = (name: string, kind: string, sortOrder: number) => db.category.create({ data: { name, kind, sortOrder } });
+  const hot = await cat("Hot Coffee", "coffee", 1);
+  const cold = await cat("Cold Drinks", "coffee", 2);
+  const sweets = await cat("Sweets & Bakery", "coffee", 3);
+  const breakfast = await cat("Breakfast", "restaurant", 4);
+  const pizza = await cat("Pizza", "restaurant", 5);
+  const burgers = await cat("Burgers & Sandwiches", "restaurant", 6);
+  const pasta = await cat("Pasta & Salads", "restaurant", 7);
 
-  type V = [string, string, number];
-  const SML = (s: number, m: number, l: number): V[] => [["صغير", "S", s], ["وسط", "M", m], ["كبير", "L", l]];
-  const MEAL = (r: number, m: number): V[] => [["عادي", "Regular", r], ["وجبة (بطاطا + مشروب)", "Meal", m]];
+  type V = [string, number];
+  const SML = (s: number, m: number, l: number): V[] => [["Small", s], ["Medium", m], ["Large", l]];
+  const MEAL = (r: number, m: number): V[] => [["Regular", r], ["Meal (fries + drink)", m]];
 
   let order = 0;
   const item = async (
-    categoryId: string, nameAr: string, nameEn: string, descAr: string, station: "coffee" | "kitchen",
+    categoryId: string, name: string, description: string, station: "coffee" | "kitchen",
     price: number, opts: { variants?: V[]; groups?: { id: string }[]; popular?: boolean } = {},
   ) =>
     db.menuItem.create({
       data: {
-        categoryId, nameAr, nameEn, descAr, station, basePrice: jd(price), isPopular: !!opts.popular, sortOrder: order++,
-        variants: opts.variants && { create: opts.variants.map(([nameAr, nameEn, p], i) => ({ nameAr, nameEn, price: jd(p), sortOrder: i, isDefault: i === (opts.variants!.length === 3 ? 1 : 0) })) },
+        categoryId, name, description, station, basePrice: jd(price), isPopular: !!opts.popular, sortOrder: order++,
+        variants: opts.variants && {
+          create: opts.variants.map(([name, p], i) => ({ name, price: jd(p), sortOrder: i, isDefault: i === (opts.variants!.length === 3 ? 1 : 0) })),
+        },
         modifierGroups: opts.groups && { connect: opts.groups.map((g) => ({ id: g.id })) },
       },
     });
 
-  const coffeeMods = [milk, sugar, shot];
-  await item(hot.id, "إسبريسو", "Espresso", "شوت مزدوج من محمصتنا، حبوب إثيوبية وبرازيلية", "coffee", 1.5, { groups: [sugar, shot] });
-  await item(hot.id, "سبانش لاتيه", "Spanish Latte", "إسبريسو مع حليب مكثّف محلّى وحليب مبخّر", "coffee", 2.75, { variants: SML(2.5, 2.75, 3.25), groups: coffeeMods, popular: true });
-  await item(hot.id, "كابتشينو", "Cappuccino", "رغوة كثيفة ناعمة فوق إسبريسو مزدوج", "coffee", 2.5, { variants: SML(2.25, 2.5, 3), groups: coffeeMods });
-  await item(hot.id, "فلات وايت", "Flat White", "حليب مخملي رقيق وطعم قهوة واضح", "coffee", 2.75, { groups: coffeeMods });
-  await item(hot.id, "قهوة عربية", "Arabic Coffee", "دلّة بالهيل، تكفي شخصين", "coffee", 2, { groups: [sugar] });
-  await item(hot.id, "V60 مقطّرة", "V60 Pour Over", "محصول اليوم، يُحضّر بالتقطير اليدوي", "coffee", 3.5);
-  await item(cold.id, "آيس لاتيه", "Iced Latte", "إسبريسو وحليب بارد على الثلج", "coffee", 2.75, { variants: SML(2.5, 2.75, 3.25), groups: coffeeMods, popular: true });
-  await item(cold.id, "آيس سبانش لاتيه", "Iced Spanish Latte", "النسخة الباردة من الأكثر طلباً", "coffee", 3, { variants: SML(2.75, 3, 3.5), groups: coffeeMods });
-  await item(cold.id, "كولد برو", "Cold Brew", "منقوع 18 ساعة، ناعم وقليل الحموضة", "coffee", 3, { groups: [sugar] });
-  await item(cold.id, "ليموناضة بالنعناع", "Mint Lemonade", "ليمون طازج ونعناع، مثلّجة", "coffee", 2.25, { variants: SML(2, 2.25, 2.75), groups: [sugar] });
-  await item(sweets.id, "تشيز كيك سان سباستيان", "San Sebastian Cheesecake", "محروقة من الأعلى، كريمية من الداخل", "coffee", 3.5, { popular: true });
-  await item(sweets.id, "كرواسون زبدة", "Butter Croissant", "يُخبز كل صباح", "coffee", 1.5);
-  await item(breakfast.id, "شكشوكة", "Shakshuka", "بيض في صلصة طماطم وفلفل، مع خبز طابون", "kitchen", 3.5);
-  await item(breakfast.id, "طبق الفطور العمّاني", "Ammani Breakfast", "حمص، فول، فلافل، لبنة، زيت وزعتر وشاي", "kitchen", 6.5, { popular: true });
-  await item(pizza.id, "بيتزا مارغريتا", "Margherita Pizza", "طماطم سان مارزانو، موزاريلا، ريحان", "kitchen", 5.5, { variants: SML(4.5, 5.5, 7), groups: [crust], popular: true });
-  await item(pizza.id, "بيتزا بيبروني", "Pepperoni Pizza", "بيبروني بقري وموزاريلا", "kitchen", 6.5, { variants: SML(5.5, 6.5, 8), groups: [crust] });
-  await item(burgers.id, "برغر دوبا الكلاسيكي", "Dopa Classic Burger", "لحم بقري 180غ، شيدر، صوص دوبا", "kitchen", 5.5, { variants: MEAL(5.5, 7.5), groups: [burgerX, sauces], popular: true });
-  await item(burgers.id, "تشيكن كرسبي", "Crispy Chicken", "صدر دجاج مقرمش، كول سلو، مخلل", "kitchen", 4.75, { variants: MEAL(4.75, 6.75), groups: [burgerX, sauces] });
-  await item(burgers.id, "حلومي ساندويش", "Halloumi Sandwich", "حلومي مشوي، بندورة، جرجير، بيستو", "kitchen", 3.75, { variants: MEAL(3.75, 5.75), groups: [sauces] });
-  await item(pasta.id, "ألفريدو دجاج", "Chicken Alfredo", "فيتوتشيني بصوص الكريمة والبارميزان", "kitchen", 6);
-  await item(pasta.id, "سلطة سيزر", "Caesar Salad", "خس روماني، خبز محمّص، بارميزان", "kitchen", 4.25);
-  await item(pasta.id, "بطاطا مقلية", "Fries", "مقرمشة مع صوص من اختيارك", "kitchen", 1.75, { groups: [sauces] });
+  const coffeeMods = [milk, sugar, extras];
+  await item(hot.id, "Espresso", "Double shot of our house blend, Ethiopian and Brazilian beans", "coffee", 1.5, { groups: [sugar, extras] });
+  await item(hot.id, "Spanish Latte", "Espresso, sweetened condensed milk and steamed milk", "coffee", 2.75, { variants: SML(2.5, 2.75, 3.25), groups: coffeeMods, popular: true });
+  await item(hot.id, "Cappuccino", "Dense, silky foam over a double espresso", "coffee", 2.5, { variants: SML(2.25, 2.5, 3), groups: coffeeMods });
+  await item(hot.id, "Flat White", "Velvety microfoam with a clear coffee-forward taste", "coffee", 2.75, { groups: coffeeMods });
+  await item(hot.id, "Cardamom Coffee", "Traditional pot with cardamom, serves two", "coffee", 2, { groups: [sugar] });
+  await item(hot.id, "V60 Pour Over", "Today's single origin, brewed by hand", "coffee", 3.5);
+  await item(cold.id, "Iced Latte", "Espresso and cold milk over ice", "coffee", 2.75, { variants: SML(2.5, 2.75, 3.25), groups: coffeeMods, popular: true });
+  await item(cold.id, "Iced Spanish Latte", "The cold take on our bestseller", "coffee", 3, { variants: SML(2.75, 3, 3.5), groups: coffeeMods });
+  await item(cold.id, "Cold Brew", "Steeped for 18 hours, smooth and low in acidity", "coffee", 3, { groups: [sugar] });
+  await item(cold.id, "Mint Lemonade", "Fresh lemon and mint, blended with ice", "coffee", 2.25, { variants: SML(2, 2.25, 2.75), groups: [sugar] });
+  await item(sweets.id, "San Sebastian Cheesecake", "Burnt top, creamy center", "coffee", 3.5, { popular: true });
+  await item(sweets.id, "Butter Croissant", "Baked fresh every morning", "coffee", 1.5);
+  await item(breakfast.id, "Shakshuka", "Eggs poached in tomato and pepper sauce, with taboon bread", "kitchen", 3.5);
+  await item(breakfast.id, "Amman Breakfast Platter", "Hummus, foul, falafel, labneh, olive oil, za'atar and tea", "kitchen", 6.5, { popular: true });
+  await item(pizza.id, "Margherita Pizza", "San Marzano tomato, mozzarella, basil", "kitchen", 5.5, { variants: SML(4.5, 5.5, 7), groups: [crust], popular: true });
+  await item(pizza.id, "Pepperoni Pizza", "Beef pepperoni and mozzarella", "kitchen", 6.5, { variants: SML(5.5, 6.5, 8), groups: [crust] });
+  await item(burgers.id, "Dopa Classic Burger", "180g beef patty, cheddar, Dopa sauce", "kitchen", 5.5, { variants: MEAL(5.5, 7.5), groups: [burgerX, sauces], popular: true });
+  await item(burgers.id, "Crispy Chicken", "Crispy chicken breast, coleslaw, pickles", "kitchen", 4.75, { variants: MEAL(4.75, 6.75), groups: [burgerX, sauces] });
+  await item(burgers.id, "Halloumi Sandwich", "Grilled halloumi, tomato, rocket, pesto", "kitchen", 3.75, { variants: MEAL(3.75, 5.75), groups: [sauces] });
+  await item(pasta.id, "Chicken Alfredo", "Fettuccine in cream and parmesan sauce", "kitchen", 6);
+  await item(pasta.id, "Caesar Salad", "Romaine, croutons, parmesan", "kitchen", 4.25);
+  await item(pasta.id, "Fries", "Crispy, with a sauce of your choice", "kitchen", 1.75, { groups: [sauces] });
 
-  // A taste of Quick 86: cold brew sold out at branch 1 today.
-  const coldBrew = await db.menuItem.findFirstOrThrow({ where: { nameEn: "Cold Brew" } });
+  // A taste of Quick 86: Cold Brew sold out at branch 1 today.
+  const coldBrew = await db.menuItem.findFirstOrThrow({ where: { name: "Cold Brew" } });
   await db.branchItemAvailability.create({ data: { branchId: b1.id, itemId: coldBrew.id, isAvailable: false } });
 
   console.log(`Seeded 2 branches, 7 categories, ${await db.menuItem.count()} items.`);

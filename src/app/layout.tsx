@@ -1,24 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const plex = IBM_Plex_Sans_Arabic({
-  variable: "--font-plex",
-  subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "600", "700"],
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: { default: "دوبا — بيت القهوة والمطعم", template: "%s · دوبا" },
-  description: "قهوة مختصة ومطبخ يومي في فرعين. اطلب من طاولتك أو مسبقاً للاستلام.",
+  title: { default: "Dopa — Cafe House & Restaurant", template: "%s · Dopa" },
+  description: "Specialty coffee and an all-day kitchen across two branches. Order from your table or pre-order for pickup.",
 };
 
 export const viewport: Viewport = { themeColor: "#F6F1E8", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ar" dir="rtl" className={`${plex.variable} h-full antialiased`}>
+    <html lang="en" dir="ltr" className={`${jakarta.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

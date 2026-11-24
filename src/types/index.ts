@@ -15,17 +15,17 @@ export type PaymentMethod = "cash" | "cliq" | "card";
 export type PaymentStatus = "unpaid" | "pending_verification" | "paid" | "rejected";
 export type CategoryKind = "coffee" | "restaurant";
 
-export const ORDER_STATUS_AR: Record<OrderStatus, string> = {
-  pending_verification: "بانتظار تأكيد الدفع",
-  received: "تم الاستلام",
-  preparing: "قيد التحضير",
-  ready: "جاهز",
-  completed: "مكتمل",
-  rejected: "مرفوض",
-  cancelled: "ملغي",
+export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
+  pending_verification: "Awaiting payment check",
+  received: "Received",
+  preparing: "Preparing",
+  ready: "Ready",
+  completed: "Completed",
+  rejected: "Rejected",
+  cancelled: "Cancelled",
 };
 
-export const PAYMENT_AR: Record<PaymentMethod, string> = { cash: "كاش", cliq: "CliQ", card: "بطاقة" };
+export const PAYMENT_LABEL: Record<PaymentMethod, string> = { cash: "Cash", cliq: "CliQ", card: "Card" };
 
 /** What a client sends to create an order. Prices are always recomputed on the server. */
 export interface CartLineInput {
@@ -52,14 +52,13 @@ export interface CreateOrderInput {
 
 export interface OrderItemModifier {
   id: string;
-  nameAr: string;
-  nameEn: string;
+  name: string;
   price: number;
 }
 
 /** JSON stored in PrintJob.payload and consumed by /print-bridge. */
 export interface PrintPayload {
-  title: string; // تذكرة الكوفي | تذكرة المطبخ | فاتورة الزبون | فتح درج الكاش
+  title: string; // COFFEE TICKET | KITCHEN TICKET | CUSTOMER RECEIPT | OPEN DRAWER
   branchName: string;
   orderNumber?: number;
   source?: OrderSource;
@@ -70,8 +69,7 @@ export interface PrintPayload {
   paymentMethod?: PaymentMethod;
   notes?: string | null;
   items: {
-    nameAr: string;
-    nameEn: string;
+    name: string;
     variant?: string | null;
     modifiers: string[];
     quantity: number;
