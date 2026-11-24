@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
-/* Dopa palette: warm paper, deep navy ink, muted sand and gold. No orange. */
+/* Dopa palette: pure white ground, deep espresso ink, warm sand/beige used sparingly. No orange, no gradients.
+   Token names kept from v1 so every portal re-themes from here. */
 @theme inline {
-  --color-paper: #f6f1e8;
-  --color-paper-2: #efe8db;
-  --color-card: #fffdf9;
-  --color-ink: #17202e;
-  --color-ink-2: #2a3446;
-  --color-muted: #6b6a66;
-  --color-line: #e2d9c8;
-  --color-sand: #d8c7a3;
-  --color-gold: #a6844a;
-  --color-gold-2: #8a6c39;
-  --color-sage: #5f7a62;
+  --color-paper: #ffffff;
+  --color-paper-2: #f8f5f0; /* one quiet sand step for grouped surfaces */
+  --color-card: #ffffff;
+  --color-ink: #2b1d14; /* espresso */
+  --color-ink-2: #4a3426;
+  --color-muted: #7a6d63;
+  --color-line: #ebe4d8; /* 1px hairline */
+  --color-sand: #dccbb0; /* beige */
+  --color-gold: #8b6a4a; /* warm coffee accent (text on white passes AA) */
+  --color-gold-2: #6e5238;
+  --color-sage: #4f6b52;
   --color-wine: #8c3b3b;
   --color-sky: #3f5f7f;
 
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
 
-  --radius-card: 1.25rem;
-  --shadow-soft: 0 1px 2px rgb(23 32 46 / 0.04), 0 8px 24px -12px rgb(23 32 46 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(23 32 46 / 0.05), 0 18px 40px -16px rgb(23 32 46 / 0.22);
+  --radius-card: 0.875rem;
+  --shadow-soft: 0 1px 2px rgb(43 29 20 / 0.04);
+  --shadow-lift: 0 1px 2px rgb(43 29 20 / 0.05), 0 16px 40px -18px rgb(43 29 20 / 0.25);
 }
 
 html {

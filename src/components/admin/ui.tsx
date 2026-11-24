@@ -85,7 +85,7 @@ export function PageHeader({ title, sub, actions }: { title: string; sub?: strin
   return (
     <header className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 sm:mb-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">{title}</h1>
+        <h1 className="font-display text-2xl font-medium text-ink sm:text-3xl">{title}</h1>
         {sub && <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">{sub}</p>}
       </div>
       {actions}

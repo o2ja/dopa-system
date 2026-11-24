@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, Ban, BellRing, Check, ClipboardList, Loader2, Receipt, Vault, Volume2, VolumeX, WifiOff } from "lucide-react";
+import { AlertCircle, Ban, BellRing, Check, ClipboardList, Loader2, LogOut, Receipt, Vault, Volume2, VolumeX, WifiOff } from "lucide-react";
 import { formatJOD } from "@/lib/money";
 import { PAYMENT_LABEL, type PaymentMethod } from "@/types";
 import { api, hhmm } from "./api";
 import { chime, unlockAudio } from "./sound";
+import { CountUp, gsap, reducedMotion, useGSAP } from "./motion";
 import { Modal, press, useNow } from "./ui";
 import Catalog from "./Catalog";
 import ChargeSheet from "./ChargeSheet";
@@ -251,34 +252,46 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
     />
   );
 
-  const rushTone = rush >= 8 ? "bg-wine/12 text-wine" : rush >= 4 ? "bg-gold/15 text-gold-2" : "bg-sage/12 text-sage";
+  const rushDot = rush >= 8 ? "bg-wine" : rush >= 4 ? "bg-gold" : "bg-sage";
+
+  const signOut = () => {
+    fetch("/api/auth/logout", { method: "POST" }).finally(() => {
+      // full reload on purpose: drops all client state along with the session
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      location.href = "/login";
+    });
+  };
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-card px-2 sm:gap-3 sm:px-4">
+      <header className="flex h-16 shrink-0 items-center gap-1 border-b border-line bg-card px-2 sm:gap-2 sm:px-4">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-4">
             <h1 className="truncate font-semibold">{branch.name}</h1>
             <Clock />
             {shift && (
-              <span className="hidden items-center gap-1.5 rounded-full bg-sage/12 px-3 py-1 text-sm font-medium text-sage md:flex">
-                <span className="size-2 rounded-full bg-sage" /> Shift open since <span className="tabular">{hhmm(shift.openedAt)}</span>
-                <span className="hidden text-sage/80 lg:inline">· {shift.cashierName}</span>
+              <span className="hidden items-center gap-2 text-sm text-ink-2 md:flex">
+                <span className="size-2 rounded-full bg-sage" aria-hidden /> Shift open since <span className="tabular">{hhmm(shift.openedAt)}</span>
+                <span className="hidden text-muted lg:inline">· {shift.cashierName}</span>
               </span>
             )}
-            {shift === null && <span className="hidden rounded-full bg-wine/12 px-3 py-1 text-sm font-medium text-wine md:block">No open shift</span>}
-            <span className={`tabular hidden rounded-full px-3 py-1 text-sm font-medium sm:block ${rushTone}`} title="Orders in the last 15 minutes">
-              {rush} in 15 min
+            {shift === null && (
+              <span className="hidden items-center gap-2 text-sm text-wine md:flex">
+                <span className="size-2 rounded-full bg-wine" aria-hidden /> No open shift
+              </span>
+            )}
+            <span className="tabular hidden items-center gap-2 text-sm text-ink-2 sm:flex" title="Orders in the last 15 minutes">
+              <span className={`size-2 rounded-full ${rushDot}`} aria-hidden /> {rush} in 15 min
             </span>
             {!online && (
-              <span className="flex items-center gap-1.5 rounded-full bg-wine/12 px-3 py-1 text-sm font-medium text-wine">
+              <span className="flex items-center gap-1.5 text-sm font-medium text-wine">
                 <WifiOff className="size-4" /> <span className="hidden sm:inline">Offline</span>
               </span>
             )}
           </div>
         </div>
 
-        <HeaderBtn label={soundOn ? "Sound alerts on" : "Enable sound alerts"} onClick={toggleSound} tone={soundOn ? "text-sage" : "bg-gold text-paper"} showLabel={!soundOn}>
+        <HeaderBtn label={soundOn ? "Sound alerts on" : "Enable sound alerts"} onClick={toggleSound} tone={soundOn ? "text-sage hover:bg-paper-2" : "border border-line text-ink hover:bg-paper-2"} showLabel={!soundOn}>
           {soundOn ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
         </HeaderBtn>
         {shift && (
@@ -300,6 +313,11 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
         <Link href="/pos?change=1" className="hidden h-11 items-center rounded-xl px-3 text-sm text-muted hover:bg-paper-2 lg:flex">
           Switch branch
         </Link>
+        <span className="hidden sm:contents">
+          <HeaderBtn label="Sign out" onClick={signOut} tone="text-muted hover:bg-paper-2">
+            <LogOut className="size-5" />
+          </HeaderBtn>
+        </span>
       </header>
 
       {shift === undefined || !categories ? (
@@ -326,13 +344,13 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
               <button onClick={() => setTicketOpen(true)} className={`flex h-14 w-full items-center justify-between rounded-xl bg-ink px-5 text-lg font-semibold text-paper ${press}`}>
                 <span className="flex items-center gap-2">
                   <Receipt className="size-5" /> Charge
-                  <span className="tabular rounded-full bg-paper/20 px-2 text-sm">{count}</span>
+                  <span className="tabular text-base font-normal opacity-80">· {count}</span>
                 </span>
-                <span className="tabular">{formatJOD(total)}</span>
+                <CountUp value={total} className="tabular" />
               </button>
             </div>
           )}
-          <p className="hidden shrink-0 border-t border-line bg-paper-2/50 px-4 py-1.5 text-xs text-muted xl:block">
+          <p className="hidden shrink-0 border-t border-line bg-paper-2 px-4 py-1.5 text-xs text-muted xl:block">
             Shortcuts: <b>/</b> search · <b>F2</b> cash · <b>F3</b> CliQ · <b>F4</b> card · <b>Q</b> orders · <b>Esc</b> close
           </p>
         </>
@@ -383,12 +401,9 @@ export default function PosApp({ branch }: { branch: PosBranch }) {
         />
       )}
 
-      <div className="pointer-events-none fixed inset-x-0 top-16 z-50 flex flex-col items-center gap-2 px-3" aria-live="polite">
+      <div className="pointer-events-none fixed inset-x-0 top-[4.5rem] z-50 flex flex-col items-center gap-2 px-3" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className={`pos-toast flex max-w-md items-center gap-2 rounded-xl px-4 py-3 font-medium shadow-lift ${t.err ? "bg-wine text-paper" : "bg-ink text-paper"}`}>
-            {t.err ? <AlertCircle className="size-5 shrink-0" /> : <Check className="size-5 shrink-0" />}
-            {t.msg}
-          </div>
+          <ToastItem key={t.id} err={t.err} msg={t.msg} />
         ))}
       </div>
     </div>
@@ -412,6 +427,17 @@ function HeaderBtn({
   tone?: string;
   showLabel?: boolean;
 }) {
+  const badgeEl = useRef<HTMLSpanElement>(null);
+  const prevBadge = useRef(badge);
+  useGSAP(
+    () => {
+      const grew = badge !== undefined && badge > (prevBadge.current ?? 0);
+      prevBadge.current = badge;
+      if (grew && !reducedMotion()) gsap.fromTo(badgeEl.current, { scale: 1.5 }, { scale: 1, duration: 0.3, ease: "back.out(2)" });
+    },
+    { dependencies: [badge] },
+  );
+
   return (
     <button
       onClick={onClick}
@@ -422,8 +448,23 @@ function HeaderBtn({
       {children}
       <span className={showLabel ? "hidden md:inline" : "hidden xl:inline"}>{label}</span>
       {badge !== undefined && (
-        <span className={`tabular absolute -end-1 -top-1 grid min-w-5 place-items-center rounded-full px-1 text-xs font-semibold text-paper ${alert ? "bg-wine" : "bg-gold"}`}>{badge}</span>
+        <span ref={badgeEl} className={`tabular absolute -end-1 -top-1 grid min-w-5 place-items-center rounded-full px-1 text-xs font-semibold text-paper ${alert ? "bg-wine" : "bg-gold"}`}>{badge}</span>
       )}
     </button>
+  );
+}
+
+function ToastItem({ msg, err }: { msg: string; err: boolean }) {
+  const el = useRef<HTMLDivElement>(null);
+  useGSAP(() => {
+    if (reducedMotion()) return;
+    // leaves just before the timer in PosApp removes it
+    gsap.timeline({ defaults: { ease: "power2.out" } }).from(el.current, { y: -12, autoAlpha: 0, duration: 0.22 }).to(el.current, { y: -8, autoAlpha: 0, duration: 0.2, ease: "power1.in" }, (err ? 5000 : 3200) / 1000 - 0.25);
+  });
+  return (
+    <div ref={el} className={`flex max-w-md items-center gap-2 rounded-xl border bg-card px-4 py-3 font-medium shadow-lift ${err ? "border-wine/40 text-wine" : "border-line text-ink"}`}>
+      {err ? <AlertCircle className="size-5 shrink-0" /> : <Check className="size-5 shrink-0 text-sage" />}
+      {msg}
+    </div>
   );
 }

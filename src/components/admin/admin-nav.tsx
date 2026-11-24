@@ -23,8 +23,8 @@ export function AdminNav({ onNavigate }: { onNavigate?: () => void }) {
             href={href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm transition-colors duration-150 ${
-              active ? "bg-card font-semibold text-ink shadow-soft" : "text-muted hover:bg-card/60 hover:text-ink"
+            className={`flex min-h-11 items-center gap-3 rounded-lg border px-3 text-sm transition-colors duration-150 ${
+              active ? "border-line bg-card font-semibold text-ink" : "border-transparent text-muted hover:bg-card/60 hover:text-ink"
             }`}
           >
             <Icon className={`size-[1.125rem] ${active ? "text-gold" : ""}`} strokeWidth={1.75} aria-hidden />

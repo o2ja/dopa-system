@@ -18,7 +18,7 @@ function Card({ url, branch, label, caption }: { url: string; branch: string; la
   return (
     <figure className="flex break-inside-avoid flex-col items-center gap-3 border border-dashed border-ink/40 bg-card px-3 py-6 text-center print:bg-white">
       <figcaption className="text-xs text-muted">Dopa · {branch}</figcaption>
-      <QRCodeSVG value={url} size={148} level="M" marginSize={0} fgColor="#17202e" bgColor="transparent" className="size-auto max-w-full" />
+      <QRCodeSVG value={url} size={148} level="M" marginSize={0} fgColor="#2b1d14" bgColor="transparent" className="size-auto max-w-full" />
       <p className="text-2xl font-bold leading-none text-ink">{label}</p>
       <p className="text-xs text-ink-2">{caption}</p>
     </figure>

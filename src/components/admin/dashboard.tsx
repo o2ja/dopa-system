@@ -3,6 +3,8 @@ import { AlertTriangle, CheckCircle2, Printer } from "lucide-react";
 import { formatJOD } from "@/lib/money";
 import { ammanClock, getAnalytics, type Range } from "./analytics";
 import { LiveRefresh } from "./live-refresh";
+import { CountUp } from "../pos/motion";
+import { Stagger } from "./stagger";
 import { PageHeader } from "./ui";
 
 const BRANCH_BG = ["bg-ink", "bg-gold"];
@@ -86,7 +88,7 @@ export async function Dashboard({ range }: { range: Range }) {
         )}
       </div>
 
-      <div className="space-y-10">
+      <Stagger className="space-y-10">
         <Section
           title="Revenue"
           aside={
@@ -110,6 +112,7 @@ export async function Dashboard({ range }: { range: Range }) {
                       return (
                         <div
                           key={b.id}
+                          data-grow="y"
                           title={`${b.name}: ${formatJOD(v)}`}
                           style={{ height: `${(v / maxDay) * 100}%`, minHeight: v ? 3 : 1 }}
                           className={`w-full max-w-5 rounded-t-sm transition-[height] duration-500 ease-out ${v ? BRANCH_BG[bi % 2] : "bg-line"}`}
@@ -132,16 +135,16 @@ export async function Dashboard({ range }: { range: Range }) {
               {d.ledger.map((b) => (
                 <div key={b.id} className="grid grid-cols-3 gap-x-3 gap-y-1 border-b border-line/70 py-3 sm:grid-cols-[1fr_repeat(3,minmax(0,6.5rem))]">
                   <span className="col-span-3 font-medium sm:col-span-1">{b.name}</span>
-                  <Cell label="Today" value={formatJOD(b.today)} />
-                  <Cell label="7 days" value={formatJOD(b.week)} muted />
-                  <Cell label="Orders" value={String(b.ordersToday)} muted />
+                  <Cell label="Today" value={b.today} />
+                  <Cell label="7 days" value={b.week} muted />
+                  <Cell label="Orders" value={b.ordersToday} kind="int" muted />
                 </div>
               ))}
               <div className="grid grid-cols-3 gap-x-3 gap-y-1 pt-3 font-semibold sm:grid-cols-[1fr_repeat(3,minmax(0,6.5rem))]">
                 <span className="col-span-3 sm:col-span-1">Total</span>
-                <Cell label="Today" value={formatJOD(sum("today"))} />
-                <Cell label="7 days" value={formatJOD(sum("week"))} />
-                <Cell label="Orders" value={String(sum("ordersToday"))} />
+                <Cell label="Today" value={sum("today")} />
+                <Cell label="7 days" value={sum("week")} />
+                <Cell label="Orders" value={sum("ordersToday")} kind="int" />
               </div>
             </div>
           </div>
@@ -185,7 +188,7 @@ export async function Dashboard({ range }: { range: Range }) {
                     <span className="font-medium">{d.sources[k]}</span>
                   </div>
                   <div className="h-1.5 rounded-full bg-paper-2">
-                    <div className="h-full rounded-full bg-ink-2 transition-[width] duration-500" style={{ width: `${(d.sources[k] / srcMax) * 100}%` }} />
+                    <div data-grow="x" className="h-full rounded-full bg-ink-2 transition-[width] duration-500" style={{ width: `${(d.sources[k] / srcMax) * 100}%` }} />
                   </div>
                 </li>
               ))}
@@ -205,7 +208,7 @@ export async function Dashboard({ range }: { range: Range }) {
                   <span className="text-end sm:order-last">{formatJOD(t.revenue)}</span>
                   <div className="col-span-3 col-start-1 flex items-center gap-3 sm:col-span-1 sm:col-start-auto">
                     <div className="h-1.5 flex-1 rounded-full bg-paper-2">
-                      <div className="h-full rounded-full bg-gold" style={{ width: `${(t.qty / topMax) * 100}%` }} />
+                      <div data-grow="x" className="h-full rounded-full bg-gold" style={{ width: `${(t.qty / topMax) * 100}%` }} />
                     </div>
                     <span className="w-14 text-end text-muted">{t.qty} sold</span>
                   </div>
@@ -225,16 +228,16 @@ export async function Dashboard({ range }: { range: Range }) {
             ))}
           </div>
         </Section>
-      </div>
+      </Stagger>
     </>
   );
 }
 
-function Cell({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
+function Cell({ label, value, kind = "jod", muted }: { label: string; value: number; kind?: "jod" | "int"; muted?: boolean }) {
   return (
     <span className="sm:text-end">
       <span className="block text-[0.6875rem] text-muted sm:hidden">{label}</span>
-      <span className={muted ? "text-muted" : ""}>{value}</span>
+      <CountUp value={value} kind={kind} from={0} duration={0.6} className={muted ? "text-muted" : ""} />
     </span>
   );
 }

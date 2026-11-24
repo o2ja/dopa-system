@@ -21,12 +21,12 @@ export default function BranchPicker({ branches, auto }: { branches: { slug: str
   return (
     <div className="grid h-full place-items-center overflow-y-auto bg-paper p-4 sm:p-6">
       <div className="w-full max-w-xl">
-        <p className="text-sm tracking-widest text-gold-2 uppercase">Dopa POS</p>
-        <h1 className="mt-1 text-3xl font-semibold sm:text-4xl">Which branch is this device for?</h1>
+        <p className="text-sm font-medium text-gold-2">Dopa POS</p>
+        <h1 className="mt-1 font-display text-3xl font-medium sm:text-4xl">Which branch is this device for?</h1>
         <p className="mt-2 text-muted">We&apos;ll remember your choice on this device.</p>
         <div className="mt-8 space-y-3">
           {branches.map((b) => (
-            <button key={b.slug} onClick={() => pick(b.slug)} className={`flex min-h-20 w-full items-center justify-between rounded-2xl border border-line bg-card p-5 text-start shadow-soft hover:border-sand ${press}`}>
+            <button key={b.slug} onClick={() => pick(b.slug)} className={`flex min-h-20 w-full items-center justify-between rounded-xl border border-line bg-card p-5 text-start hover:border-sand ${press}`}>
               <span>
                 <span className="block text-xl font-semibold">{b.name}</span>
                 {b.address && (

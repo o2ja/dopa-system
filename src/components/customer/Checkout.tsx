@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, ArrowLeft, Banknote, Check, Copy, Landmark, LoaderCircle, ShoppingBag, Upload } from "lucide-react";
+import { AlertCircle, ArrowLeft, Banknote, Check, Copy, Landmark, LoaderCircle, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
@@ -11,7 +11,7 @@ import type { BranchDTO, ItemDTO } from "./types";
 
 const PHONE = /^07[789]\d{7}$/;
 const field =
-  "h-12 w-full rounded-2xl bg-paper-2 px-4 outline-none placeholder:text-muted/70 focus-visible:ring-2 focus-visible:ring-gold";
+  "h-12 w-full rounded-xl border border-line bg-card px-4 outline-none transition-colors placeholder:text-muted/70 focus-visible:border-ink focus-visible:ring-1 focus-visible:ring-ink aria-[invalid=true]:border-wine";
 
 export function Checkout({ branch, table, items }: { branch: BranchDTO; table: number | null; items: Record<string, ItemDTO> }) {
   const router = useRouter();
@@ -113,25 +113,22 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
 
   if (lines.length === 0 && !submitting)
     return (
-      <div className="grid place-items-center gap-3 py-24 text-center">
-        <span className="grid size-16 place-items-center rounded-full bg-paper-2">
-          <ShoppingBag className="size-7 text-muted" />
-        </span>
-        <h1 className="text-2xl font-semibold">Your cart is empty</h1>
-        <p className="text-muted">Add something from the {branch.name} menu.</p>
-        <Link href={back} className="mt-2 flex min-h-12 items-center rounded-full bg-ink px-7 font-semibold text-paper hover:bg-ink-2 active:scale-95">
+      <div className="py-24 text-center">
+        <h1 className="font-display text-4xl font-medium tracking-tight">Your cart is empty</h1>
+        <p className="mt-3 text-muted">Add something from the {branch.name} menu.</p>
+        <Link href={back} className="mt-8 inline-flex min-h-12 items-center rounded-full bg-ink px-7 font-semibold text-paper transition-[background-color,transform] hover:bg-ink-2 active:scale-95">
           Back to the menu
         </Link>
       </div>
     );
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_26rem] xl:gap-12">
-      <aside className="rounded-card bg-card p-5 lg:sticky lg:top-6 lg:col-start-2 lg:row-start-1">
-        <h2 className="mb-3 text-lg font-semibold">Order summary</h2>
-        <ul className="divide-y divide-line">
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_26rem] xl:gap-16">
+      <aside className="rounded-card border border-line bg-card p-6 lg:sticky lg:top-6 lg:col-start-2 lg:row-start-1">
+        <h2 className="font-display text-2xl font-medium tracking-tight">Order summary</h2>
+        <ul className="mt-3 divide-y divide-line">
           {priced.map((l) => (
-            <li key={l.key} className="flex items-start gap-3 py-3">
+            <li key={l.key} className="flex items-start gap-3 py-3.5">
               <div className="min-w-0 flex-1">
                 <p className={`font-medium ${l.ok ? "" : "text-muted line-through"}`}>
                   <span className="tabular">{l.quantity}×</span> {l.name}
@@ -148,46 +145,46 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex items-baseline justify-between rounded-2xl bg-paper-2 px-4 py-3">
+        <div className="mt-2 flex items-baseline justify-between border-t border-line pt-5">
           <span className="text-muted">Total ({cartCount(lines)} {cartCount(lines) === 1 ? "item" : "items"})</span>
-          <span className="tabular text-2xl font-semibold">{formatJOD(total)}</span>
+          <span className="tabular font-display text-3xl font-medium tracking-tight">{formatJOD(total)}</span>
         </div>
       </aside>
 
-      <div className="space-y-8 lg:col-start-1 lg:row-start-1">
+      <div className="space-y-10 lg:col-start-1 lg:row-start-1">
         <div>
-          <Link href={back} className="mb-4 inline-flex min-h-11 items-center gap-2 text-muted transition-colors hover:text-ink">
+          <Link href={back} className="mb-5 inline-flex min-h-11 items-center gap-2 text-muted transition-colors hover:text-ink">
             <ArrowLeft className="size-4" /> Back to the menu
           </Link>
-          <h1 className="text-3xl font-semibold md:text-4xl">Checkout</h1>
-          <p className="mt-1 text-muted">
+          <h1 className="font-display text-4xl font-medium tracking-[-0.02em] md:text-5xl">Checkout</h1>
+          <p className="mt-2 text-muted">
             {dine ? `Table ${table} · ${branch.name}` : `Pickup at ${branch.name} · ${hoursLabel(branch.hours)}`}
           </p>
         </div>
 
         {!branch.isOpen && (
-          <p role="alert" className="rounded-2xl bg-wine/10 p-4 font-medium text-wine">This branch is closed right now, so the order can&apos;t be sent.</p>
+          <p role="alert" className="rounded-card border border-wine/40 p-4 font-medium text-wine">This branch is closed right now, so the order can&apos;t be sent.</p>
         )}
 
         {dine ? (
           <fieldset>
-            <legend className="mb-3 text-lg font-semibold">Payment method</legend>
-            <div className="grid gap-3 sm:grid-cols-2" role="radiogroup">
+            <legend className="mb-4 font-display text-2xl font-medium tracking-tight">Payment method</legend>
+            <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Payment method">
               <PayOption on={method === "cash"} onClick={() => setMethod("cash")} icon={<Banknote className="size-6" />} title="Cash" text="Pay at the counter" />
               <PayOption on={method === "cliq"} onClick={() => setMethod("cliq")} icon={<Landmark className="size-6" />} title="CliQ" text="Transfer and upload the receipt" />
             </div>
           </fieldset>
         ) : (
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold">Pickup details</h2>
-            <div className="grid gap-4 md:grid-cols-2">
+          <section className="space-y-5">
+            <h2 className="font-display text-2xl font-medium tracking-tight">Pickup details</h2>
+            <div className="grid gap-5 md:grid-cols-2">
               <label className="block">
-                <span className="mb-1.5 block text-sm font-medium">Name</span>
+                <span className="mb-2 block text-sm font-medium">Name</span>
                 <input value={name} onChange={(e) => setName(e.target.value)} onBlur={() => setTouched(true)} autoComplete="name" maxLength={80} placeholder="Your name" className={field} aria-invalid={touched && !nameOk} />
-                {touched && !nameOk && <span className="mt-1 block text-sm text-wine">Enter your name</span>}
+                {touched && !nameOk && <span className="mt-1.5 block text-sm text-wine">Enter your name</span>}
               </label>
               <label className="block">
-                <span className="mb-1.5 block text-sm font-medium">Phone</span>
+                <span className="mb-2 block text-sm font-medium">Phone</span>
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
@@ -198,11 +195,11 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
                   className={`${field} tabular`}
                   aria-invalid={touched && !phoneOk}
                 />
-                {touched && !phoneOk && <span className="mt-1 block text-sm text-wine">Use a Jordan mobile number, e.g. 0791234567</span>}
+                {touched && !phoneOk && <span className="mt-1.5 block text-sm text-wine">Use a Jordan mobile number, e.g. 0791234567</span>}
               </label>
             </div>
             <label className="block md:max-w-xs">
-              <span className="mb-1.5 block text-sm font-medium">Pickup time (today)</span>
+              <span className="mb-2 block text-sm font-medium">Pickup time (today)</span>
               {slots.length ? (
                 <select value={chosenSlot} onChange={(e) => setSlot(e.target.value)} className={`${field} tabular`}>
                   {slots.map((s) => (
@@ -210,35 +207,35 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
                   ))}
                 </select>
               ) : (
-                <p className="rounded-2xl bg-wine/10 p-3 text-sm text-wine">No pickup times are left today before the branch closes.</p>
+                <p className="rounded-xl border border-wine/40 p-3 text-sm text-wine">No pickup times are left today before the branch closes.</p>
               )}
             </label>
           </section>
         )}
 
         {method === "cliq" && (
-          <section aria-labelledby="cliq-h" className="overflow-hidden rounded-card bg-ink text-paper">
+          <section aria-labelledby="cliq-h" className="rounded-card border border-line bg-card">
             <div className="p-6 md:p-8">
-              <h2 id="cliq-h" className="text-lg font-semibold">Transfer the amount with CliQ</h2>
-              <p className="mt-4 text-sm text-paper/70">CliQ alias</p>
+              <h2 id="cliq-h" className="font-display text-2xl font-medium tracking-tight">Transfer the amount with CliQ</h2>
+              <p className="mt-5 text-sm text-muted">CliQ alias</p>
               <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-4xl font-semibold tracking-wide md:text-5xl">{branch.cliqAlias}</p>
-                <button type="button" onClick={copy} className="flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-paper/15 px-4 font-medium transition hover:bg-paper/25 active:scale-95">
+                <p className="font-display text-4xl font-medium tracking-wide md:text-5xl">{branch.cliqAlias}</p>
+                <button type="button" onClick={copy} className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line px-5 font-medium transition-[background-color,transform] hover:bg-paper-2 active:scale-95">
                   {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
                   {copied ? "Copied" : "Copy alias"}
                 </button>
               </div>
-              {branch.cliqName && <p className="mt-1 text-paper/80">{branch.cliqName}</p>}
-              <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-4 rounded-2xl bg-paper/10 px-4 py-3">
-                <span className="text-paper/80">Exact amount to transfer</span>
-                <span className="tabular text-2xl font-semibold text-sand">{formatJOD(total)}</span>
+              {branch.cliqName && <p className="mt-1 text-ink-2">{branch.cliqName}</p>}
+              <div className="mt-6 flex flex-wrap items-baseline justify-between gap-x-4 border-t border-line pt-5">
+                <span className="text-muted">Exact amount to transfer</span>
+                <span className="tabular font-display text-3xl font-medium tracking-tight">{formatJOD(total)}</span>
               </div>
             </div>
 
-            <div className="bg-ink-2 p-6 md:p-8">
+            <div className="border-t border-line p-6 md:p-8">
               <h3 className="font-semibold">Upload your transfer receipt</h3>
-              <div className="mt-3 grid gap-4 md:grid-cols-[1fr_auto] md:items-start">
-                <label className="flex min-h-14 cursor-pointer items-center justify-center gap-3 rounded-2xl bg-paper/10 px-4 py-3 text-center font-medium transition hover:bg-paper/20 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold">
+              <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-start">
+                <label className="flex min-h-14 cursor-pointer items-center justify-center gap-3 rounded-xl border border-dashed border-sand px-4 py-3 text-center font-medium transition-colors hover:border-ink hover:bg-paper-2 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold">
                   <input
                     type="file"
                     accept="image/*"
@@ -249,23 +246,23 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
                       e.target.value = "";
                     }}
                   />
-                  {upload.busy ? <LoaderCircle className="size-5 animate-spin" /> : receipt ? <Check className="size-5 text-sand" /> : <Upload className="size-5" />}
+                  {upload.busy ? <LoaderCircle className="size-5 animate-spin" /> : receipt ? <Check className="size-5 text-sage" /> : <Upload className="size-5" />}
                   {upload.busy ? "Uploading..." : receipt ? "Receipt uploaded · tap to change" : "Choose receipt image"}
                 </label>
                 {receipt && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={receipt} alt="Uploaded CliQ receipt" className="max-h-48 w-full rounded-2xl bg-paper/10 object-contain md:w-48" />
+                  <img src={receipt} alt="Uploaded CliQ receipt" className="max-h-48 w-full rounded-xl border border-line object-contain md:w-48" />
                 )}
               </div>
               {upload.error && (
-                <p role="alert" className="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-sand">
+                <p role="alert" className="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-wine">
                   <AlertCircle className="size-4" /> {upload.error}
                   {upload.file && (
                     <button type="button" onClick={() => void send(upload.file!)} className="min-h-11 font-semibold underline">Try again</button>
                   )}
                 </p>
               )}
-              <p className="mt-4 text-sm leading-relaxed text-paper/70">
+              <p className="mt-4 text-sm leading-relaxed text-muted">
                 {dine
                   ? "The cashier checks the transfer, then your order goes to the kitchen."
                   : "Your order is confirmed, and preparation starts, only after the cashier verifies the transfer. You can follow its status live on the next page."}
@@ -275,13 +272,13 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
         )}
 
         {method === "cash" && dine && (
-          <p className="rounded-2xl bg-sage/15 p-4 text-sage">
-            Your order goes to the kitchen right away. You&apos;ll pay <span className="tabular font-semibold">{formatJOD(total)}</span> in cash at the counter.
+          <p className="rounded-card border border-line p-4 text-ink-2">
+            Your order goes to the kitchen right away. You&apos;ll pay <span className="tabular font-semibold text-ink">{formatJOD(total)}</span> in cash at the counter.
           </p>
         )}
 
         {error && (
-          <p role="alert" className="flex items-center gap-2 rounded-2xl bg-wine/10 p-4 font-medium text-wine">
+          <p role="alert" className="flex items-center gap-2 rounded-card border border-wine/40 p-4 font-medium text-wine">
             <AlertCircle className="size-5 shrink-0" /> {error}
           </p>
         )}
@@ -291,7 +288,7 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
             type="button"
             onClick={submit}
             disabled={submitting || !ready}
-            className="flex h-14 w-full items-center justify-between gap-3 rounded-full bg-ink px-7 text-lg font-semibold text-paper transition active:scale-[0.99] enabled:hover:bg-ink-2 disabled:bg-muted/30 disabled:text-muted"
+            className="flex h-14 w-full items-center justify-between gap-3 rounded-full bg-ink px-7 text-lg font-semibold text-paper transition-[background-color,transform] active:scale-[0.99] enabled:hover:bg-ink-2 disabled:bg-line disabled:text-muted"
           >
             <span className="flex items-center gap-2">
               {submitting && <LoaderCircle className="size-5 animate-spin" />}
@@ -300,7 +297,7 @@ export function Checkout({ branch, table, items }: { branch: BranchDTO; table: n
             <span className="tabular">{formatJOD(total)}</span>
           </button>
           {!ready && !submitting && (
-            <p className="mt-2 text-center text-sm text-muted">
+            <p className="mt-3 text-center text-sm text-muted">
               {blocked
                 ? "Remove the unavailable items to continue."
                 : needReceipt && !receipt
@@ -323,12 +320,12 @@ function PayOption({ on, onClick, icon, title, text }: { on: boolean; onClick: (
       role="radio"
       aria-checked={on}
       onClick={onClick}
-      className={`flex min-h-16 items-center gap-4 rounded-card p-4 text-start transition active:scale-[0.99] ${on ? "bg-ink text-paper" : "bg-card hover:bg-paper-2"}`}
+      className={`flex min-h-16 items-center gap-4 rounded-card border p-4 text-start transition-[border-color,transform] active:scale-[0.99] ${on ? "border-ink ring-1 ring-ink" : "border-line hover:border-sand"}`}
     >
-      <span className={on ? "text-sand" : "text-gold-2"}>{icon}</span>
+      <span className={on ? "text-ink" : "text-muted"}>{icon}</span>
       <span>
         <span className="block font-semibold">{title}</span>
-        <span className={`block text-sm ${on ? "text-paper/70" : "text-muted"}`}>{text}</span>
+        <span className="block text-sm text-muted">{text}</span>
       </span>
     </button>
   );
