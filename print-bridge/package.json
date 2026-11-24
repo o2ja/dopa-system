@@ -1,0 +1,12 @@
+{
+  "name": "dopa-print-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Per-branch bridge: polls the Dopa server and prints tickets/receipts on Deloo ESC/POS printers over the LAN",
+  "engines": { "node": ">=20.12" },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test-render.js"
+  }
+}
