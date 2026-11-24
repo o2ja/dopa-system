@@ -42,14 +42,14 @@ export default function Quick86({ categories, unavailable, onToggle, onClose }: 
                       onClick={() => onToggle(i)}
                       role="switch"
                       aria-checked={!off}
-                      className={`flex h-16 w-full items-center justify-between rounded-xl border px-4 sm:px-5 ${press} ${off ? "border-wine/40 bg-wine/8" : "border-line bg-card hover:border-sand"}`}
+                      className={`flex h-16 w-full items-center justify-between rounded-xl border px-4 sm:px-5 ${press} ${off ? "border-line bg-paper-2" : "border-line bg-card hover:border-sand"}`}
                     >
                       <span className="text-start">
                         <span className={`font-semibold ${off ? "text-wine line-through decoration-1" : ""}`}>{i.name}</span>
                         <span className="block text-xs text-muted">{off ? "Sold out" : "Available"}</span>
                       </span>
-                      <span className={`relative h-8 w-14 shrink-0 rounded-full transition-colors duration-200 ${off ? "bg-wine" : "bg-sage"}`}>
-                        <span className={`absolute start-1 top-1 size-6 rounded-full bg-card shadow-soft transition-transform duration-200 ${off ? "" : "translate-x-6"}`} />
+                      <span className={`relative h-8 w-14 shrink-0 rounded-full transition-colors duration-200 ${off ? "bg-line" : "bg-sage"}`}>
+                        <span className={`absolute start-1 top-1 size-6 rounded-full bg-card transition-transform duration-200 ${off ? "" : "translate-x-6"}`} />
                       </span>
                     </button>
                   </li>

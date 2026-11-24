@@ -34,8 +34,8 @@ function Tile({ item, off, onTap, onLongPress }: { item: PosItem; off: boolean; 
         onLongPress();
       }}
       onClick={() => !fired.current && !off && onTap()}
-      className={`relative flex min-h-24 flex-col justify-between rounded-2xl border p-3 text-start sm:min-h-28 sm:p-4 ${press} ${
-        off ? "border-dashed border-line bg-paper-2/60 opacity-55" : "border-line bg-card shadow-soft hover:border-sand active:bg-paper-2"
+      className={`relative flex min-h-24 flex-col justify-between rounded-xl border p-3 text-start sm:min-h-28 sm:p-4 ${press} ${
+        off ? "border-dashed border-line bg-paper-2 opacity-60" : "border-line bg-card hover:border-sand active:bg-paper-2"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -85,7 +85,7 @@ export default function Catalog({
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
-      <nav className="scroll-thin flex shrink-0 gap-2 overflow-x-auto border-b border-line bg-paper-2/50 p-2 md:w-40 md:flex-col md:overflow-x-visible md:overflow-y-auto md:border-b-0 md:border-e md:p-3 xl:w-44">
+      <nav className="scroll-thin flex shrink-0 gap-2 overflow-x-auto border-b border-line bg-paper-2 p-2 md:w-40 md:flex-col md:overflow-x-visible md:overflow-y-auto md:border-b-0 md:border-e md:p-3 xl:w-44">
         {tabs.map((c) => (
           <button
             key={c.id}
@@ -93,7 +93,7 @@ export default function Catalog({
               setActive(c.id);
               setQ("");
             }}
-            className={`shrink-0 rounded-xl px-4 py-3 text-start font-semibold md:py-4 ${press} ${!needle && active === c.id ? "bg-ink text-paper shadow-soft" : "text-ink-2 hover:bg-paper-2 active:bg-paper-2"}`}
+            className={`min-h-12 shrink-0 rounded-xl px-4 py-3 text-start font-semibold md:py-4 ${press} ${!needle && active === c.id ? "bg-ink text-paper" : "text-ink-2 hover:bg-card active:bg-card"}`}
           >
             {c.name}
           </button>

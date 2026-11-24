@@ -37,7 +37,7 @@ function Thumb({ item }: { item: Pick<ItemData, "image" | "name"> }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img src={item.image} alt="" className="size-11 shrink-0 rounded-lg object-cover" />
   ) : (
-    <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-sand/40 text-lg font-semibold text-gold-2" aria-hidden>
+    <span className="grid size-11 shrink-0 place-items-center rounded-lg border border-line bg-paper-2 text-lg font-semibold text-gold-2" aria-hidden>
       {item.name.trim().charAt(0).toUpperCase()}
     </span>
   );

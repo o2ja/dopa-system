@@ -55,7 +55,7 @@ export default function ShiftModal({ shiftId, onClose, onClosed }: { shiftId: st
                 <h3 className="text-2xl font-semibold">Dopa · {r.shift.branchName}</h3>
                 <p className="text-muted">End-of-shift report (Z)</p>
               </div>
-              <dl className="mt-6 divide-y divide-line rounded-2xl border border-line sm:text-lg">
+              <dl className="mt-6 divide-y divide-line rounded-xl border border-line sm:text-lg">
                 <Row k="Cashier" v={r.shift.cashierName} />
                 <Row k="Opened" v={<span className="tabular">{hhmm(r.shift.openedAt)}</span>} />
                 {r.shift.closedAt && <Row k="Closed" v={<span className="tabular">{hhmm(r.shift.closedAt)}</span>} />}
@@ -108,7 +108,7 @@ export default function ShiftModal({ shiftId, onClose, onClosed }: { shiftId: st
               <button
                 disabled={busy || actual === ""}
                 onClick={close}
-                className={`flex h-16 items-center justify-center gap-2 rounded-xl text-base font-semibold text-paper disabled:opacity-40 sm:text-lg ${press} ${confirm ? "bg-wine" : "bg-ink"}`}
+                className={`flex h-16 items-center justify-center gap-2 rounded-xl text-base font-semibold disabled:opacity-40 sm:text-lg ${press} ${confirm ? "border border-wine bg-card text-wine" : "bg-ink text-paper"}`}
               >
                 {busy && <Loader2 className="size-5 animate-spin" />}
                 {confirm ? "Tap again to confirm" : "Close shift"}
@@ -123,7 +123,7 @@ export default function ShiftModal({ shiftId, onClose, onClosed }: { shiftId: st
 
 function Row({ k, v, strong }: { k: string; v: React.ReactNode; strong?: boolean }) {
   return (
-    <div className={`flex items-center justify-between gap-3 px-4 py-3 sm:px-5 ${strong ? "bg-paper-2/60 font-semibold" : ""}`}>
+    <div className={`flex items-center justify-between gap-3 px-4 py-3 sm:px-5 ${strong ? "bg-paper-2 font-semibold" : ""}`}>
       <dt className="text-muted">{k}</dt>
       <dd className="tabular">{v}</dd>
     </div>

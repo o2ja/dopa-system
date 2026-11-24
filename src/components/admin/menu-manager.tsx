@@ -25,7 +25,7 @@ export function MenuManager({ categories, items, groups }: { categories: Categor
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className={`-mb-px min-h-11 shrink-0 border-b-2 px-4 text-sm transition-colors ${tab === id ? "border-gold font-semibold text-ink" : "border-transparent text-muted hover:text-ink"}`}
+            className={`-mb-px min-h-11 shrink-0 border-b-2 px-4 text-sm transition-colors ${tab === id ? "border-ink font-semibold text-ink" : "border-transparent text-muted hover:text-ink"}`}
           >
             {label}
             {id === "items" && <span className="tabular ms-1.5 text-xs text-muted">{items.length}</span>}
