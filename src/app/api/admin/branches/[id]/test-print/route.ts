@@ -5,7 +5,7 @@ import { guard, Invalid, oneOf, readBody } from "../../../_util";
 
 export const POST = guard(async (req: Request, ctx: RouteContext<"/api/admin/branches/[id]/test-print">) => {
   const { id } = await ctx.params;
-  const station = oneOf(await readBody(req), "station", "Station", ["coffee", "kitchen", "cashier"])!;
+  const station = oneOf(await readBody(req), "station", "Station", ["coffee", "kitchen", "pizza", "cashier"])!;
   const branch = await db.branch.findUnique({ where: { id } });
   if (!branch) throw new Invalid("Branch not found", 404);
 

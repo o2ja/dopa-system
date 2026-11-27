@@ -21,14 +21,14 @@ async function main() {
       data: {
         slug: "branch-1", name: "Dopa · Jabal Amman", address: "Rainbow Street, Jabal Amman",
         phone: "0790000001", hours: "08:00-24:00", cliqAlias: "DOPAJA", cliqName: "Dopa Cafe House LLC",
-        coffeePrinterIp: "192.168.1.101", kitchenPrinterIp: "192.168.1.102", cashierPrinterIp: "192.168.1.103",
+        coffeePrinterIp: "192.168.1.101", kitchenPrinterIp: "192.168.1.102", cashierPrinterIp: "192.168.1.103", pizzaPrinterIp: "192.168.1.104",
       },
     }),
     db.branch.create({
       data: {
         slug: "branch-2", name: "Dopa · University St.", address: "University Street, opposite the main gate",
         phone: "0790000002", hours: "07:00-01:00", cliqAlias: "DOPAUNI", cliqName: "Dopa Cafe House LLC", tableCount: 16,
-        coffeePrinterIp: "192.168.2.101", kitchenPrinterIp: "192.168.2.102", cashierPrinterIp: "192.168.2.103",
+        coffeePrinterIp: "192.168.2.101", kitchenPrinterIp: "192.168.2.102", cashierPrinterIp: "192.168.2.103", pizzaPrinterIp: "192.168.2.104",
       },
     }),
   ]);
@@ -60,7 +60,7 @@ async function main() {
 
   let order = 0;
   const item = async (
-    categoryId: string, name: string, description: string, station: "coffee" | "kitchen",
+    categoryId: string, name: string, description: string, station: "coffee" | "kitchen" | "pizza",
     price: number, opts: { variants?: V[]; groups?: { id: string }[]; popular?: boolean } = {},
   ) =>
     db.menuItem.create({
@@ -88,8 +88,8 @@ async function main() {
   await item(sweets.id, "Butter Croissant", "Baked fresh every morning", "coffee", 1.5);
   await item(breakfast.id, "Shakshuka", "Eggs poached in tomato and pepper sauce, with taboon bread", "kitchen", 3.5);
   await item(breakfast.id, "Amman Breakfast Platter", "Hummus, foul, falafel, labneh, olive oil, za'atar and tea", "kitchen", 6.5, { popular: true });
-  await item(pizza.id, "Margherita Pizza", "San Marzano tomato, mozzarella, basil", "kitchen", 5.5, { variants: SML(4.5, 5.5, 7), groups: [crust], popular: true });
-  await item(pizza.id, "Pepperoni Pizza", "Beef pepperoni and mozzarella", "kitchen", 6.5, { variants: SML(5.5, 6.5, 8), groups: [crust] });
+  await item(pizza.id, "Margherita Pizza", "San Marzano tomato, mozzarella, basil", "pizza", 5.5, { variants: SML(4.5, 5.5, 7), groups: [crust], popular: true });
+  await item(pizza.id, "Pepperoni Pizza", "Beef pepperoni and mozzarella", "pizza", 6.5, { variants: SML(5.5, 6.5, 8), groups: [crust] });
   await item(burgers.id, "Dopa Classic Burger", "180g beef patty, cheddar, Dopa sauce", "kitchen", 5.5, { variants: MEAL(5.5, 7.5), groups: [burgerX, sauces], popular: true });
   await item(burgers.id, "Crispy Chicken", "Crispy chicken breast, coleslaw, pickles", "kitchen", 4.75, { variants: MEAL(4.75, 6.75), groups: [burgerX, sauces] });
   await item(burgers.id, "Halloumi Sandwich", "Grilled halloumi, tomato, rocket, pesto", "kitchen", 3.75, { variants: MEAL(3.75, 5.75), groups: [sauces] });

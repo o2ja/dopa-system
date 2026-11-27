@@ -15,14 +15,14 @@ interface Form {
   description: string;
   image: string | null;
   price: string;
-  station: "coffee" | "kitchen";
+  station: "coffee" | "kitchen" | "pizza";
   isActive: boolean;
   isPopular: boolean;
   variants: { name: string; price: string; isDefault: boolean }[];
   groupIds: string[];
 }
 
-const STATION_LABEL = { coffee: "Coffee", kitchen: "Kitchen" };
+const STATION_LABEL = { coffee: "Coffee", kitchen: "Kitchen", pizza: "Pizza" };
 const SIZES = ["Small", "Medium", "Large"];
 
 const toForm = (i: ItemData): Form => ({
@@ -98,6 +98,7 @@ export function MenuItems({ categories, items, groups }: { categories: CategoryD
             <option value="">All stations</option>
             <option value="coffee">Coffee</option>
             <option value="kitchen">Kitchen</option>
+            <option value="pizza">Pizza</option>
           </select>
           <button className={btn("primary", "sm:col-span-2 lg:col-span-1")} disabled={!categories.length} onClick={() => setEditing(blank())}>
             <Plus className="size-4" strokeWidth={1.75} aria-hidden />
@@ -272,6 +273,7 @@ function ItemEditor({
             options={[
               ["coffee", "Coffee"],
               ["kitchen", "Kitchen"],
+              ["pizza", "Pizza"],
             ]}
           />
         </div>

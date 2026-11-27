@@ -11,7 +11,7 @@ const BRANCH_BG = ["bg-ink", "bg-gold"];
 const PAY = [
   { key: "cash", label: "Cash", bg: "bg-sage" },
   { key: "cliq", label: "CliQ", bg: "bg-sky" },
-  { key: "card", label: "Card", bg: "bg-gold" },
+  { key: "card", label: "Card / Visa", bg: "bg-gold" },
 ] as const;
 const SOURCE_LABEL = { pos: "Point of sale", qr: "Table QR", pickup: "Pickup" };
 

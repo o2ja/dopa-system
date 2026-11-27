@@ -19,6 +19,7 @@ export interface BranchData {
   cliqName: string;
   coffeePrinterIp: string;
   kitchenPrinterIp: string;
+  pizzaPrinterIp: string;
   cashierPrinterIp: string;
   tableCount: number;
 }
@@ -34,7 +35,7 @@ export interface JobRow {
   at: string; // preformatted on the server
 }
 
-const STATION_LABEL: Record<string, string> = { coffee: "Coffee", kitchen: "Kitchen", cashier: "Cashier" };
+const STATION_LABEL: Record<string, string> = { coffee: "Coffee", kitchen: "Kitchen", pizza: "Pizza", cashier: "Cashier" };
 const TYPE_LABEL: Record<string, string> = { ticket: "Ticket", receipt: "Receipt", open_drawer: "Open drawer" };
 const STATUS: Record<string, { label: string; cls: string }> = {
   pending: { label: "Queued", cls: "text-sky" },
@@ -45,6 +46,7 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 const PRINTERS = [
   ["coffeePrinterIp", "Coffee printer", "coffee"],
   ["kitchenPrinterIp", "Kitchen printer", "kitchen"],
+  ["pizzaPrinterIp", "Pizza printer", "pizza"],
   ["cashierPrinterIp", "Cashier printer", "cashier"],
 ] as const;
 
@@ -125,7 +127,7 @@ export function BranchEditor({ branch, jobs }: { branch: BranchData; jobs: JobRo
             </Field>
           </div>
 
-          <fieldset className="grid gap-4 sm:grid-cols-3">
+          <fieldset className="grid gap-4 sm:grid-cols-2">
             <legend className="mb-3 text-sm font-semibold">Printer IPs (IPv4, port 9100)</legend>
             {PRINTERS.map(([k, label]) => {
               const invalid = !!f[k] && !IPV4.test(f[k]);

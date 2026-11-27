@@ -1,4 +1,4 @@
-export type Station = "coffee" | "kitchen";
+export type Station = "coffee" | "kitchen" | "pizza";
 export type PrintStation = Station | "cashier";
 export type PrintJobType = "ticket" | "receipt" | "open_drawer";
 export type PrintJobStatus = "pending" | "printed" | "failed";
@@ -40,7 +40,7 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   cancelled: "Cancelled",
 };
 
-export const PAYMENT_LABEL: Record<PaymentMethod, string> = { cash: "Cash", cliq: "CliQ", card: "Card" };
+export const PAYMENT_LABEL: Record<PaymentMethod, string> = { cash: "Cash", cliq: "CliQ", card: "Card / Visa" };
 
 /** What a client sends to create an order. Prices are always recomputed on the server. */
 export interface CartLineInput {

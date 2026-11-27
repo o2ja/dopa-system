@@ -9,7 +9,7 @@ export async function GET(req: Request) {
 
   const branch = await db.branch.findFirst({
     where: { OR: [{ id: key }, { slug: key }] },
-    select: { id: true, slug: true, coffeePrinterIp: true, kitchenPrinterIp: true, cashierPrinterIp: true },
+    select: { id: true, slug: true, coffeePrinterIp: true, kitchenPrinterIp: true, pizzaPrinterIp: true, cashierPrinterIp: true },
   });
   if (!branch) return NextResponse.json({ error: "branch not found" }, { status: 404 });
 

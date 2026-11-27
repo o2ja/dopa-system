@@ -16,7 +16,7 @@ export async function parseItem(b: Body, optional: boolean) {
     description: str(b, "description", "Description", { ...o, allowEmpty: true, max: 500 }),
     image,
     basePrice: int(b, "basePrice", "Price", o),
-    station: oneOf(b, "station", "Station", ["coffee", "kitchen"], o),
+    station: oneOf(b, "station", "Station", ["coffee", "kitchen", "pizza"], o),
     isActive: bool(b, "isActive", o),
     isPopular: bool(b, "isPopular", o),
   };

@@ -12,7 +12,7 @@ const BILLS = [1, 5, 10, 20, 50];
 const METHODS: { id: PaymentMethod; label: string; icon: typeof Banknote }[] = [
   { id: "cash", label: "Cash", icon: Banknote },
   { id: "cliq", label: "CliQ", icon: Smartphone },
-  { id: "card", label: "Card", icon: CreditCard },
+  { id: "card", label: "Card / Visa", icon: CreditCard },
 ];
 
 export default function ChargeSheet({

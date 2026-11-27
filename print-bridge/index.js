@@ -21,7 +21,7 @@ const log = (...a) => console.log(new Date().toISOString(), ...a);
 const headers = { "x-bridge-secret": BRIDGE_SECRET, "content-type": "application/json" };
 const api = (p, init) => fetch(`${API_BASE_URL.replace(/\/+$/, "")}${p}`, { ...init, headers, signal: AbortSignal.timeout(8000) });
 
-const ENV_IP = { coffee: process.env.COFFEE_PRINTER_IP, kitchen: process.env.KITCHEN_PRINTER_IP, cashier: process.env.CASHIER_PRINTER_IP };
+const ENV_IP = { coffee: process.env.COFFEE_PRINTER_IP, kitchen: process.env.KITCHEN_PRINTER_IP, pizza: process.env.PIZZA_PRINTER_IP, cashier: process.env.CASHIER_PRINTER_IP };
 const printerIp = (station, branch) => ENV_IP[station] || branch[`${station}PrinterIp`] || "";
 
 async function fetchPending() {
