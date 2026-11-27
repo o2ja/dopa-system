@@ -51,4 +51,5 @@ Everything runs locally now and deploys cleanly to a single **VPS (Ubuntu)** lat
 
 ## 7. Git Workflow
 - Remote: `https://github.com/o2ja/dopa-system.git`. One feature branch per wave, conventional commits (`feat:`, `fix:`, `chore:`), push, then PR + merge via `gh` (or a clean merge into `main` + push) after each verified wave.
+- **Auto-PR & Auto-Merge:** After completing any task and confirming `tsc`, `lint`, `build`, and tests pass, automatically commit, push the feature branch, create a GitHub PR to `main`, merge it immediately (`--squash --delete-branch`), and switch back to an updated `main` without waiting for manual user approval.
 - Docker is available. SQLite stays the local default; add `docker-compose.yml` (Postgres) when moving toward the VPS.
