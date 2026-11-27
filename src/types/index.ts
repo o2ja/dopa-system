@@ -10,7 +10,8 @@ export type OrderStatus =
   | "ready"
   | "completed"
   | "rejected"
-  | "cancelled";
+  | "cancelled"
+  | "voided";
 export type PaymentMethod = "cash" | "cliq" | "card";
 export type PaymentStatus = "unpaid" | "pending_verification" | "paid" | "rejected";
 
@@ -31,13 +32,14 @@ export interface ReceiptVerification {
 export type CategoryKind = "coffee" | "restaurant";
 
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
-  pending_verification: "Awaiting payment check",
+  pending_verification: "Awaiting payment",
   received: "Received",
   preparing: "Preparing",
   ready: "Ready",
   completed: "Completed",
   rejected: "Rejected",
   cancelled: "Cancelled",
+  voided: "Voided",
 };
 
 export const PAYMENT_LABEL: Record<PaymentMethod, string> = { cash: "Cash", cliq: "CliQ", card: "Card / Visa" };
@@ -61,8 +63,13 @@ export interface CreateOrderInput {
   customerPhone?: string;
   pickupTime?: string | null; // ISO
   notes?: string;
-  receiptUrl?: string | null; // required for source=pickup (CliQ)
   shiftId?: string | null;
+  clientId?: string | null; // POS offline queue id: re-sending the same one returns the existing order
+  discount?: { type: "percent" | "fixed"; value: number } | null; // percent 1-100, or fils
+  skipReceipt?: boolean; // tickets + drawer still print, customer receipt does not
+  printedLocally?: boolean; // offline order already printed through the local bridge
+  createdBy?: string;
+  approvedBy?: string;
 }
 
 export interface OrderItemModifier {
@@ -75,7 +82,7 @@ export interface OrderItemModifier {
 export interface PrintPayload {
   title: string; // COFFEE TICKET | KITCHEN TICKET | CUSTOMER RECEIPT | OPEN DRAWER
   branchName: string;
-  orderNumber?: number;
+  orderNumber?: number | string;
   source?: OrderSource;
   tableNumber?: number | null;
   customerName?: string | null;
@@ -92,6 +99,10 @@ export interface PrintPayload {
     lineTotal: number; // fils
   }[];
   subtotal?: number;
+  discount?: number; // fils
   total?: number;
   reprint?: boolean;
 }
+
+export type Role = "SUPER_ADMIN" | "BRANCH_ADMIN" | "CASHIER";
+export const ROLES: readonly Role[] = ["SUPER_ADMIN", "BRANCH_ADMIN", "CASHIER"];
