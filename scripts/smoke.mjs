@@ -65,7 +65,7 @@ let r = await j("/api/pos/orders", { method: "POST", body: JSON.stringify({ bran
 assert.equal(r.status, 201, JSON.stringify(r.body));
 assert.equal(r.body.total, 2 * large.price + 5500, "server-side price");
 const jobs = await db.printJob.findMany({ where: { orderId: r.body.id } });
-assert.deepEqual(jobs.map((x) => x.station).sort(), ["cashier", "coffee", "kitchen"]);
+assert.deepEqual(jobs.map((x) => x.station).sort(), ["cashier", "coffee", "kitchen", "pizza"]);
 assert.ok(jobs.find((x) => x.station === "cashier").openCashDrawer, "drawer on cash");
 console.log("pos split print ok");
 

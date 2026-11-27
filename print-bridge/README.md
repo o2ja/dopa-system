@@ -27,7 +27,7 @@ node index.js
 | `BRANCH_ID` | This branch's slug (`branch-1`) or id. One bridge per branch. |
 | `BRIDGE_SECRET` | Must match the server's `BRIDGE_SECRET` |
 | `DRY_RUN` | `true` writes `.txt` previews and `.bin` ESC/POS bytes to `./debug-receipts/` and sends nothing to printers. Jobs are still reported as printed. |
-| `COFFEE_PRINTER_IP`, `KITCHEN_PRINTER_IP`, `CASHIER_PRINTER_IP` | Optional overrides. If empty, the IPs saved in Admin > Branches are used. |
+| `COFFEE_PRINTER_IP`, `KITCHEN_PRINTER_IP`, `PIZZA_PRINTER_IP`, `CASHIER_PRINTER_IP` | Optional overrides. If empty, the IPs saved in Admin > Branches are used. |
 
 ## What gets printed
 

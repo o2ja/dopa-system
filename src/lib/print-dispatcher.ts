@@ -1,11 +1,11 @@
 import { db } from "@/lib/db";
 import type { OrderItemModifier, PrintPayload, Station } from "@/types";
 
-const TICKET_TITLE: Record<Station, string> = { coffee: "COFFEE TICKET", kitchen: "KITCHEN TICKET" };
+const TICKET_TITLE: Record<Station, string> = { coffee: "COFFEE TICKET", kitchen: "KITCHEN TICKET", pizza: "PIZZA TICKET" };
 
 /**
  * Splits an order into print jobs: one prep ticket per station that has items
- * (coffee / kitchen) + one cashier receipt. A paid cash receipt also pulses the RJ11 drawer.
+ * (coffee / kitchen / pizza) + one cashier receipt. A paid cash receipt also pulses the RJ11 drawer.
  * Skips if the order already has jobs, unless reprint=true (reprints never open the drawer).
  */
 export async function dispatchPrintJobs(orderId: string, opts: { reprint?: boolean } = {}) {
@@ -38,7 +38,7 @@ export async function dispatchPrintJobs(orderId: string, opts: { reprint?: boole
   });
 
   const jobs: { station: string; jobType: string; payload: PrintPayload; openCashDrawer: boolean }[] = [];
-  for (const station of ["coffee", "kitchen"] as Station[]) {
+  for (const station of ["coffee", "kitchen", "pizza"] as Station[]) {
     const items = order.items.filter((i) => i.station === station);
     if (items.length)
       jobs.push({ station, jobType: "ticket", openCashDrawer: false, payload: { ...base, title: TICKET_TITLE[station], items: items.map(toLine) } });

@@ -17,6 +17,7 @@ export const PATCH = guard(async (req: Request, ctx: RouteContext<"/api/admin/br
       cliqName: str(b, "cliqName", "CliQ account name", { optional: true, allowEmpty: true, max: 80 }),
       coffeePrinterIp: ip(b, "coffeePrinterIp", "Coffee printer IP", { optional: true }),
       kitchenPrinterIp: ip(b, "kitchenPrinterIp", "Kitchen printer IP", { optional: true }),
+      pizzaPrinterIp: ip(b, "pizzaPrinterIp", "Pizza printer IP", { optional: true }),
       cashierPrinterIp: ip(b, "cashierPrinterIp", "Cashier printer IP", { optional: true }),
       tableCount: int(b, "tableCount", "Table count", { optional: true, max: 200 }),
     },

@@ -62,7 +62,7 @@ export default function ShiftModal({ shiftId, onClose, onClosed }: { shiftId: st
                 <Row k="Paid orders" v={<span className="tabular">{r.sales.orderCount}</span>} />
                 <Row k="Cash sales" v={formatJOD(r.sales.cash)} />
                 <Row k="CliQ sales" v={formatJOD(r.sales.cliq)} />
-                <Row k="Card sales" v={formatJOD(r.sales.card)} />
+                <Row k="Card / Visa sales" v={formatJOD(r.sales.card)} />
                 <Row k="Total sales" v={formatJOD(r.sales.cash + r.sales.cliq + r.sales.card)} strong />
                 <Row k="Opening float" v={formatJOD(r.shift.openingFloat)} />
                 <Row k="Expected cash in drawer" v={formatJOD(r.expectedCash)} strong />

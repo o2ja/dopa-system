@@ -182,7 +182,7 @@ export default function Ticket({
         <div className="grid grid-cols-3 gap-2">
           <Pay disabled={disabled} onClick={() => onCharge("cash")} icon={<Banknote className="size-6" />} label="Cash" hint="F2" primary />
           <Pay disabled={disabled} onClick={() => onCharge("cliq")} icon={<Smartphone className="size-6" />} label="CliQ" hint="F3" />
-          <Pay disabled={disabled} onClick={() => onCharge("card")} icon={<CreditCard className="size-6" />} label="Card" hint="F4" />
+          <Pay disabled={disabled} onClick={() => onCharge("card")} icon={<CreditCard className="size-6" />} label="Card / Visa" hint="F4" />
         </div>
       </div>
     </div>

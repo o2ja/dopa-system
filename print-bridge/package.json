@@ -7,6 +7,6 @@
   "engines": { "node": ">=20.12" },
   "scripts": {
     "start": "node index.js",
-    "test": "node test-render.js"
+    "test": "node test-render.js", "test-printers": "node test-printers.js"
   }
 }

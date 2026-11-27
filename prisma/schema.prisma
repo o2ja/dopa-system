@@ -24,6 +24,7 @@ model Branch {
   coffeePrinterIp  String   @default("")
   kitchenPrinterIp String   @default("")
   cashierPrinterIp String   @default("")
+  pizzaPrinterIp   String   @default("")
   tableCount       Int      @default(20)
   createdAt        DateTime @default(now())
 
@@ -48,7 +49,7 @@ model MenuItem {
   description      String   @default("")
   image       String?
   basePrice   Int      // fils; used when item has no variants
-  station     String   // coffee | kitchen
+  station     String   // coffee | kitchen | pizza
   isActive    Boolean  @default(true)
   isPopular   Boolean  @default(false)
   sortOrder   Int      @default(0)
@@ -191,7 +192,7 @@ model PrintJob {
   id             String    @id @default(cuid())
   branchId       String
   orderId        String?
-  station        String    // coffee | kitchen | cashier
+  station        String    // coffee | kitchen | pizza | cashier
   jobType        String    // ticket | receipt | open_drawer
   payload        String    @default("{}") // JSON PrintPayload
   openCashDrawer Boolean   @default(false)

@@ -21,6 +21,14 @@ const base = {
 const jobs = [
   { id: "t-coffee", station: "coffee", jobType: "ticket", openCashDrawer: false, payload: { ...base, title: "COFFEE TICKET" } },
   { id: "t-kitchen", station: "kitchen", jobType: "ticket", openCashDrawer: false, payload: { ...base, title: "KITCHEN TICKET", reprint: true } },
+  { id: "t-pizza", station: "pizza", jobType: "ticket", openCashDrawer: false, payload: { ...base, title: "PIZZA TICKET" } },
+  {
+    id: "t-card",
+    station: "cashier",
+    jobType: "receipt",
+    openCashDrawer: false,
+    payload: { ...base, title: "CUSTOMER RECEIPT", paymentMethod: "card", subtotal: 8250, total: 8250 },
+  },
   {
     id: "t-receipt",
     station: "cashier",

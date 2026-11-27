@@ -6,7 +6,7 @@ const fmtTime = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-d
 
 const jod = (fils) => `JOD ${(Number(fils || 0) / 1000).toFixed(2)}`;
 const date = (iso) => (iso ? fmtDate.format(new Date(iso)).replace(",", "") : "");
-const PAY = { cash: "CASH", cliq: "CLIQ", card: "CARD" };
+const PAY = { cash: "CASH", cliq: "CLIQ", card: "CARD / VISA" };
 
 function where(p) {
   if (p.tableNumber != null) return `TABLE ${p.tableNumber}`;

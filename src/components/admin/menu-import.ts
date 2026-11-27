@@ -6,6 +6,7 @@ export const CSV_TEMPLATE = [
   CSV_COLUMNS.join(","),
   "Hot Coffee,coffee,Latte,Steamed milk and espresso,coffee,2.75,Small:2.5|Medium:2.75|Large:3.25",
   "Kitchen,restaurant,Croissant,,kitchen,1.75,",
+  "Pizza,restaurant,Margherita,,pizza,5.5,Small:4.5|Large:7",
 ].join("\n");
 
 export interface ImportRow {
@@ -13,7 +14,7 @@ export interface ImportRow {
   kind: "coffee" | "restaurant";
   name: string;
   description: string;
-  station: "coffee" | "kitchen";
+  station: "coffee" | "kitchen" | "pizza";
   basePrice: number; // fils
   variants: { name: string; price: number; isDefault: boolean; sortOrder: number }[];
 }
@@ -30,7 +31,7 @@ export function parseImportRow(raw: Record<string, unknown>): { row: ImportRow }
   const kind = g("kind");
   if (kind !== "coffee" && kind !== "restaurant") errors.push("kind must be coffee or restaurant");
   const station = g("station");
-  if (station !== "coffee" && station !== "kitchen") errors.push("station must be coffee or kitchen");
+  if (station !== "coffee" && station !== "kitchen" && station !== "pizza") errors.push("station must be coffee, kitchen or pizza");
 
   const variants: ImportRow["variants"] = [];
   const vs = g("variants");
